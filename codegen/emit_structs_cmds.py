@@ -212,6 +212,47 @@ def emit_structs(reg: VkRegistry, supported: set[VkType]) -> str:
                 )
             lines.append("        }\n    }\n\n")
 
+            lines.append(
+                f"    pub fn decode_pnext_partial(dec: &mut Decoder<'_>) -> Result<Vec<{pnext_enum_name}>, WireError> {{\n"
+                f"        if !dec.read_simple_pointer()? {{\n"
+                f"            return Ok(Vec::new());\n"
+                f"        }}\n"
+                f"        let stype = VkStructureType::decode(dec)?;\n"
+                f"        let mut tail = Self::decode_pnext_partial(dec)?;\n"
+                f"        let node = match stype {{\n"
+            )
+            for nxt in chain:
+                vname = nxt.name[2:] if nxt.name.startswith("Vk") else nxt.name
+                nxt_pnext = "Vec::new()" if get_chain(nxt) else "()"
+                lines.append(
+                    f"            VkStructureType::{nxt.s_type} => {pnext_enum_name}::{vname}(Box::new({nxt.name}::decode_partial_self(dec, stype, {nxt_pnext})?)),\n"
+                )
+            lines.append(
+                f"            _ => return Err(WireError::InvalidStructureType(stype.0)),\n"
+                f"        }};\n"
+                f"        tail.insert(0, node);\n"
+                f"        Ok(tail)\n"
+                f"    }}\n\n"
+            )
+            lines.append(
+                f"    pub fn encode_pnext_partial<S: WireSink>(enc: &mut Encoder<S>, chain: &[{pnext_enum_name}]) -> Result<(), WireError> {{\n"
+                f"        let Some((head, tail)) = chain.split_first() else {{\n"
+                f"            return enc.write_simple_pointer(false);\n"
+                f"        }};\n"
+                f"        enc.write_simple_pointer(true)?;\n"
+                f"        match head {{\n"
+            )
+            for nxt in chain:
+                vname = nxt.name[2:] if nxt.name.startswith("Vk") else nxt.name
+                lines.append(
+                    f"            {pnext_enum_name}::{vname}(v) => {{\n"
+                    f"                VkStructureType::{nxt.s_type}.encode(enc)?;\n"
+                    f"                Self::encode_pnext_partial(enc, tail)?;\n"
+                    f"                v.encode_partial_self(enc)\n"
+                    f"            }}\n"
+                )
+            lines.append("        }\n    }\n\n")
+
         # decode_self / decode / decode_partial
         if ty.s_type:
             pnext_param = f"p_next: Vec<{pnext_enum_name}>" if chain else "_p_next: ()"
@@ -238,12 +279,9 @@ def emit_structs(reg: VkRegistry, supported: set[VkType]) -> str:
                 lines.append("        Self::decode_self(dec, s_type, ())\n")
             lines.append("    }\n\n")
 
-            lines.append("    pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {\n")
-            lines.append("        let s_type = VkStructureType::decode(dec)?;\n")
-            if chain:
-                lines.append("        let p_next = Self::decode_pnext(dec)?;\n")
-            else:
-                lines.append("        if dec.read_simple_pointer()? { return Err(WireError::InvalidPointerFlag(1)); }\n")
+            lines.append(
+                f"    pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, {pnext_param}) -> Result<Self, WireError> {{\n"
+            )
             for var in ty.variables[skip_vars:]:
                 lines.extend(emit_struct_decode_member(ty, var, vars_map, True, "        "))
             lines.append("        let mut out = Self::default();\n        out.s_type = s_type;\n")
@@ -251,7 +289,17 @@ def emit_structs(reg: VkRegistry, supported: set[VkType]) -> str:
                 lines.append("        out.p_next = p_next;\n")
             lines.append("        Ok(out)\n    }\n\n")
 
-            # encode_self / encode / encode_partial
+            lines.append("    pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {\n")
+            lines.append("        let s_type = VkStructureType::decode(dec)?;\n")
+            if chain:
+                lines.append("        let p_next = Self::decode_pnext_partial(dec)?;\n")
+                lines.append("        Self::decode_partial_self(dec, s_type, p_next)\n")
+            else:
+                lines.append("        if dec.read_simple_pointer()? { return Err(WireError::InvalidPointerFlag(1)); }\n")
+                lines.append("        Self::decode_partial_self(dec, s_type, ())\n")
+            lines.append("    }\n\n")
+
+            # encode_self / encode / encode_partial_self / encode_partial
             lines.append("    pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {\n")
             for var in ty.variables[skip_vars:]:
                 lines.extend(emit_struct_encode_member(ty, var, vars_map, False, "self.", "        "))
@@ -265,15 +313,18 @@ def emit_structs(reg: VkRegistry, supported: set[VkType]) -> str:
                 lines.append("        enc.write_simple_pointer(false)?;\n")
             lines.append("        self.encode_self(enc)\n    }\n\n")
 
+            lines.append("    pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {\n")
+            for var in ty.variables[skip_vars:]:
+                lines.extend(emit_struct_encode_member(ty, var, vars_map, True, "self.", "        "))
+            lines.append("        Ok(())\n    }\n\n")
+
             lines.append("    pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {\n")
             lines.append("        self.s_type.encode(enc)?;\n")
             if chain:
-                lines.append("        Self::encode_pnext(enc, &self.p_next)?;\n")
+                lines.append("        Self::encode_pnext_partial(enc, &self.p_next)?;\n")
             else:
                 lines.append("        enc.write_simple_pointer(false)?;\n")
-            for var in ty.variables[skip_vars:]:
-                lines.extend(emit_struct_encode_member(ty, var, vars_map, True, "self.", "        "))
-            lines.append("        Ok(())\n    }\n")
+            lines.append("        self.encode_partial_self(enc)\n    }\n")
         else:
             lines.append("    pub fn decode(dec: &mut Decoder<'_>) -> Result<Self, WireError> {\n")
             for var in ty.variables:
