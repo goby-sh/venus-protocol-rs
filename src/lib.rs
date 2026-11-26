@@ -1,5 +1,12 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
+#[cfg(feature = "alloc")]
+extern crate alloc;
+
+pub mod wire;
+
+pub use wire::*;
+
 pub const WIRE_FORMAT_VERSION: u32 = 1;
 
 #[cfg(test)]
