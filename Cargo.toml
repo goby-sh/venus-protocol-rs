@@ -1,0 +1,12 @@
+[package]
+name = "venus-protocol"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+description = "Rust implementation of the Mesa Venus Vulkan wire protocol (virgl/venus-protocol)"
+repository = "https://github.com/goby-sh/venus-protocol-rs"
+
+[features]
+default = ["std"]
+std = ["alloc"]
+alloc = []
