@@ -782,6 +782,9 @@ impl VkCopyMemoryToImageIndirectCommandKHR {
     }
 
     pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        let _ = VkImageSubresourceLayers::decode_partial(dec)?;
+        let _ = VkOffset3D::decode_partial(dec)?;
+        let _ = VkExtent3D::decode_partial(dec)?;
         Ok(Self::default())
     }
 
@@ -796,6 +799,9 @@ impl VkCopyMemoryToImageIndirectCommandKHR {
     }
 
     pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.image_subresource.encode_partial(enc)?;
+        self.image_offset.encode_partial(enc)?;
+        self.image_extent.encode_partial(enc)?;
         Ok(())
     }
 }
@@ -2717,6 +2723,7 @@ impl VkPhysicalDeviceFeatures2 {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, p_next: Vec<VkPhysicalDeviceFeatures2PNext>) -> Result<Self, WireError> {
+        let _ = VkPhysicalDeviceFeatures::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         out.p_next = p_next;
@@ -2741,6 +2748,7 @@ impl VkPhysicalDeviceFeatures2 {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.features.encode_partial(enc)?;
         Ok(())
     }
 
@@ -3538,6 +3546,7 @@ impl VkPhysicalDeviceProperties2 {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, p_next: Vec<VkPhysicalDeviceProperties2PNext>) -> Result<Self, WireError> {
+        let _ = VkPhysicalDeviceProperties::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         out.p_next = p_next;
@@ -3562,6 +3571,7 @@ impl VkPhysicalDeviceProperties2 {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.properties.encode_partial(enc)?;
         Ok(())
     }
 
@@ -3696,6 +3706,7 @@ impl VkFormatProperties2 {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, p_next: Vec<VkFormatProperties2PNext>) -> Result<Self, WireError> {
+        let _ = VkFormatProperties::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         out.p_next = p_next;
@@ -3720,6 +3731,7 @@ impl VkFormatProperties2 {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.format_properties.encode_partial(enc)?;
         Ok(())
     }
 
@@ -3854,6 +3866,7 @@ impl VkImageFormatProperties2 {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, p_next: Vec<VkImageFormatProperties2PNext>) -> Result<Self, WireError> {
+        let _ = VkImageFormatProperties::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         out.p_next = p_next;
@@ -3878,6 +3891,7 @@ impl VkImageFormatProperties2 {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.image_format_properties.encode_partial(enc)?;
         Ok(())
     }
 
@@ -4199,6 +4213,7 @@ impl VkQueueFamilyProperties2 {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, p_next: Vec<VkQueueFamilyProperties2PNext>) -> Result<Self, WireError> {
+        let _ = VkQueueFamilyProperties::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         out.p_next = p_next;
@@ -4223,6 +4238,7 @@ impl VkQueueFamilyProperties2 {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.queue_family_properties.encode_partial(enc)?;
         Ok(())
     }
 
@@ -4318,6 +4334,7 @@ impl VkPhysicalDeviceMemoryProperties2 {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, p_next: Vec<VkPhysicalDeviceMemoryProperties2PNext>) -> Result<Self, WireError> {
+        let _ = VkPhysicalDeviceMemoryProperties::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         out.p_next = p_next;
@@ -4342,6 +4359,7 @@ impl VkPhysicalDeviceMemoryProperties2 {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.memory_properties.encode_partial(enc)?;
         Ok(())
     }
 
@@ -4374,6 +4392,7 @@ impl VkSparseImageFormatProperties2 {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkSparseImageFormatProperties::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -4397,6 +4416,7 @@ impl VkSparseImageFormatProperties2 {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.properties.encode_partial(enc)?;
         Ok(())
     }
 
@@ -4619,6 +4639,7 @@ impl VkPhysicalDeviceDriverProperties {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkConformanceVersion::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -4647,6 +4668,7 @@ impl VkPhysicalDeviceDriverProperties {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.conformance_version.encode_partial(enc)?;
         Ok(())
     }
 
@@ -4828,6 +4850,7 @@ impl VkExternalImageFormatProperties {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkExternalMemoryProperties::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -4851,6 +4874,7 @@ impl VkExternalImageFormatProperties {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.external_memory_properties.encode_partial(enc)?;
         Ok(())
     }
 
@@ -5010,6 +5034,7 @@ impl VkExternalBufferProperties {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkExternalMemoryProperties::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -5033,6 +5058,7 @@ impl VkExternalBufferProperties {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.external_memory_properties.encode_partial(enc)?;
         Ok(())
     }
 
@@ -7636,6 +7662,7 @@ impl VkMemoryRequirements2 {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, p_next: Vec<VkMemoryRequirements2PNext>) -> Result<Self, WireError> {
+        let _ = VkMemoryRequirements::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         out.p_next = p_next;
@@ -7660,6 +7687,7 @@ impl VkMemoryRequirements2 {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.memory_requirements.encode_partial(enc)?;
         Ok(())
     }
 
@@ -7692,6 +7720,7 @@ impl VkSparseImageMemoryRequirements2 {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkSparseImageMemoryRequirements::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -7715,6 +7744,7 @@ impl VkSparseImageMemoryRequirements2 {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.memory_requirements.encode_partial(enc)?;
         Ok(())
     }
 
@@ -8106,6 +8136,7 @@ impl VkSamplerYcbcrConversionCreateInfo {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkComponentMapping::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -8136,6 +8167,7 @@ impl VkSamplerYcbcrConversionCreateInfo {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.components.encode_partial(enc)?;
         Ok(())
     }
 
@@ -14241,6 +14273,7 @@ impl VkAccelerationStructureInstanceKHR {
     }
 
     pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        let _ = VkTransformMatrixKHR::decode_partial(dec)?;
         Ok(Self::default())
     }
 
@@ -14255,6 +14288,7 @@ impl VkAccelerationStructureInstanceKHR {
     }
 
     pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.transform.encode_partial(enc)?;
         Ok(())
     }
 }
@@ -14588,6 +14622,11 @@ impl VkImageCopy2 {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkImageSubresourceLayers::decode_partial(dec)?;
+        let _ = VkOffset3D::decode_partial(dec)?;
+        let _ = VkImageSubresourceLayers::decode_partial(dec)?;
+        let _ = VkOffset3D::decode_partial(dec)?;
+        let _ = VkExtent3D::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -14615,6 +14654,11 @@ impl VkImageCopy2 {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.src_subresource.encode_partial(enc)?;
+        self.src_offset.encode_partial(enc)?;
+        self.dst_subresource.encode_partial(enc)?;
+        self.dst_offset.encode_partial(enc)?;
+        self.extent.encode_partial(enc)?;
         Ok(())
     }
 
@@ -14672,6 +14716,12 @@ impl VkImageBlit2 {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkImageSubresourceLayers::decode_partial(dec)?;
+        let _sz = dec.read_array_size(2 as u64)?;
+        for _ in 0.._sz { let _ = VkOffset3D::decode_partial(dec)?; }
+        let _ = VkImageSubresourceLayers::decode_partial(dec)?;
+        let _sz = dec.read_array_size(2 as u64)?;
+        for _ in 0.._sz { let _ = VkOffset3D::decode_partial(dec)?; }
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -14700,6 +14750,12 @@ impl VkImageBlit2 {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.src_subresource.encode_partial(enc)?;
+        enc.write_array_size(2 as u64)?;
+        for item in &self.src_offsets { item.encode_partial(enc)?; }
+        self.dst_subresource.encode_partial(enc)?;
+        enc.write_array_size(2 as u64)?;
+        for item in &self.dst_offsets { item.encode_partial(enc)?; }
         Ok(())
     }
 
@@ -14747,6 +14803,9 @@ impl VkBufferImageCopy2 {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkImageSubresourceLayers::decode_partial(dec)?;
+        let _ = VkOffset3D::decode_partial(dec)?;
+        let _ = VkExtent3D::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -14775,6 +14834,9 @@ impl VkBufferImageCopy2 {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.image_subresource.encode_partial(enc)?;
+        self.image_offset.encode_partial(enc)?;
+        self.image_extent.encode_partial(enc)?;
         Ok(())
     }
 
@@ -14819,6 +14881,11 @@ impl VkImageResolve2 {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkImageSubresourceLayers::decode_partial(dec)?;
+        let _ = VkOffset3D::decode_partial(dec)?;
+        let _ = VkImageSubresourceLayers::decode_partial(dec)?;
+        let _ = VkOffset3D::decode_partial(dec)?;
+        let _ = VkExtent3D::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -14846,6 +14913,11 @@ impl VkImageResolve2 {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.src_subresource.encode_partial(enc)?;
+        self.src_offset.encode_partial(enc)?;
+        self.dst_subresource.encode_partial(enc)?;
+        self.dst_offset.encode_partial(enc)?;
+        self.extent.encode_partial(enc)?;
         Ok(())
     }
 
@@ -15739,6 +15811,7 @@ impl VkImageMemoryBarrier2 {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, p_next: Vec<VkImageMemoryBarrier2PNext>) -> Result<Self, WireError> {
+        let _ = VkImageSubresourceRange::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         out.p_next = p_next;
@@ -15772,6 +15845,7 @@ impl VkImageMemoryBarrier2 {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.subresource_range.encode_partial(enc)?;
         Ok(())
     }
 
@@ -16587,6 +16661,7 @@ impl VkHostImageLayoutTransitionInfo {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkImageSubresourceRange::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -16613,6 +16688,7 @@ impl VkHostImageLayoutTransitionInfo {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.subresource_range.encode_partial(enc)?;
         Ok(())
     }
 
@@ -17291,6 +17367,7 @@ impl VkRenderingInfo {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, p_next: Vec<VkRenderingInfoPNext>) -> Result<Self, WireError> {
+        let _ = VkRect2D::decode_partial(dec)?;
         let _ = dec.read_array_size_unchecked()?;
         let _ = dec.read_simple_pointer()?;
         let _ = dec.read_simple_pointer()?;
@@ -17332,6 +17409,7 @@ impl VkRenderingInfo {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.render_area.encode_partial(enc)?;
         enc.write_array_size(self.p_color_attachments.len() as u64)?;
         enc.write_simple_pointer(self.p_depth_attachment.is_some())?;
         enc.write_simple_pointer(self.p_stencil_attachment.is_some())?;
@@ -17652,6 +17730,7 @@ impl VkImageSubresource2 {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkImageSubresource::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -17675,6 +17754,7 @@ impl VkImageSubresource2 {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.image_subresource.encode_partial(enc)?;
         Ok(())
     }
 
@@ -17770,6 +17850,7 @@ impl VkSubresourceLayout2 {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, p_next: Vec<VkSubresourceLayout2PNext>) -> Result<Self, WireError> {
+        let _ = VkSubresourceLayout::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         out.p_next = p_next;
@@ -17794,6 +17875,7 @@ impl VkSubresourceLayout2 {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.subresource_layout.encode_partial(enc)?;
         Ok(())
     }
 
@@ -19332,6 +19414,8 @@ impl VkRect2D {
     }
 
     pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        let _ = VkOffset2D::decode_partial(dec)?;
+        let _ = VkExtent2D::decode_partial(dec)?;
         Ok(Self::default())
     }
 
@@ -19342,6 +19426,8 @@ impl VkRect2D {
     }
 
     pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.offset.encode_partial(enc)?;
+        self.extent.encode_partial(enc)?;
         Ok(())
     }
 }
@@ -19366,6 +19452,7 @@ impl VkClearRect {
     }
 
     pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        let _ = VkRect2D::decode_partial(dec)?;
         Ok(Self::default())
     }
 
@@ -19377,6 +19464,7 @@ impl VkClearRect {
     }
 
     pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.rect.encode_partial(enc)?;
         Ok(())
     }
 }
@@ -19478,6 +19566,8 @@ impl VkPhysicalDeviceProperties {
     }
 
     pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        let _ = VkPhysicalDeviceLimits::decode_partial(dec)?;
+        let _ = VkPhysicalDeviceSparseProperties::decode_partial(dec)?;
         Ok(Self::default())
     }
 
@@ -19497,6 +19587,8 @@ impl VkPhysicalDeviceProperties {
     }
 
     pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.limits.encode_partial(enc)?;
+        self.sparse_properties.encode_partial(enc)?;
         Ok(())
     }
 }
@@ -22681,6 +22773,7 @@ impl VkQueueFamilyProperties {
     }
 
     pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        let _ = VkExtent3D::decode_partial(dec)?;
         Ok(Self::default())
     }
 
@@ -22693,6 +22786,7 @@ impl VkQueueFamilyProperties {
     }
 
     pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.min_image_transfer_granularity.encode_partial(enc)?;
         Ok(())
     }
 }
@@ -22735,6 +22829,10 @@ impl VkPhysicalDeviceMemoryProperties {
     }
 
     pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        let _sz = dec.read_array_size(VK_MAX_MEMORY_TYPES as u64)?;
+        for _ in 0.._sz { let _ = VkMemoryType::decode_partial(dec)?; }
+        let _sz = dec.read_array_size(VK_MAX_MEMORY_HEAPS as u64)?;
+        for _ in 0.._sz { let _ = VkMemoryHeap::decode_partial(dec)?; }
         Ok(Self::default())
     }
 
@@ -22749,6 +22847,10 @@ impl VkPhysicalDeviceMemoryProperties {
     }
 
     pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        enc.write_array_size(VK_MAX_MEMORY_TYPES as u64)?;
+        for item in &self.memory_types { item.encode_partial(enc)?; }
+        enc.write_array_size(VK_MAX_MEMORY_HEAPS as u64)?;
+        for item in &self.memory_heaps { item.encode_partial(enc)?; }
         Ok(())
     }
 }
@@ -23045,6 +23147,7 @@ impl VkSparseImageFormatProperties {
     }
 
     pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        let _ = VkExtent3D::decode_partial(dec)?;
         Ok(Self::default())
     }
 
@@ -23056,6 +23159,7 @@ impl VkSparseImageFormatProperties {
     }
 
     pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.image_granularity.encode_partial(enc)?;
         Ok(())
     }
 }
@@ -23086,6 +23190,7 @@ impl VkSparseImageMemoryRequirements {
     }
 
     pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        let _ = VkSparseImageFormatProperties::decode_partial(dec)?;
         Ok(Self::default())
     }
 
@@ -23099,6 +23204,7 @@ impl VkSparseImageMemoryRequirements {
     }
 
     pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.format_properties.encode_partial(enc)?;
         Ok(())
     }
 }
@@ -23227,6 +23333,7 @@ impl VkImageFormatProperties {
     }
 
     pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        let _ = VkExtent3D::decode_partial(dec)?;
         Ok(Self::default())
     }
 
@@ -23240,6 +23347,7 @@ impl VkImageFormatProperties {
     }
 
     pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.max_extent.encode_partial(enc)?;
         Ok(())
     }
 }
@@ -24324,6 +24432,7 @@ impl VkImageMemoryBarrier {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, p_next: Vec<VkImageMemoryBarrierPNext>) -> Result<Self, WireError> {
+        let _ = VkImageSubresourceRange::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         out.p_next = p_next;
@@ -24355,6 +24464,7 @@ impl VkImageMemoryBarrier {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.subresource_range.encode_partial(enc)?;
         Ok(())
     }
 
@@ -24566,6 +24676,7 @@ impl VkImageCreateInfo {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, p_next: Vec<VkImageCreateInfoPNext>) -> Result<Self, WireError> {
+        let _ = VkExtent3D::decode_partial(dec)?;
         let _ = dec.read_array_size_unchecked()?;
         let mut out = Self::default();
         out.s_type = s_type;
@@ -24604,6 +24715,7 @@ impl VkImageCreateInfo {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.extent.encode_partial(enc)?;
         enc.write_array_size(self.p_queue_family_indices.len() as u64)?;
         Ok(())
     }
@@ -24797,6 +24909,8 @@ impl VkImageViewCreateInfo {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, p_next: Vec<VkImageViewCreateInfoPNext>) -> Result<Self, WireError> {
+        let _ = VkComponentMapping::decode_partial(dec)?;
+        let _ = VkImageSubresourceRange::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         out.p_next = p_next;
@@ -24826,6 +24940,8 @@ impl VkImageViewCreateInfo {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.components.encode_partial(enc)?;
+        self.subresource_range.encode_partial(enc)?;
         Ok(())
     }
 
@@ -24943,6 +25059,9 @@ impl VkSparseImageMemoryBind {
     }
 
     pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        let _ = VkImageSubresource::decode_partial(dec)?;
+        let _ = VkOffset3D::decode_partial(dec)?;
+        let _ = VkExtent3D::decode_partial(dec)?;
         Ok(Self::default())
     }
 
@@ -24957,6 +25076,9 @@ impl VkSparseImageMemoryBind {
     }
 
     pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.subresource.encode_partial(enc)?;
+        self.offset.encode_partial(enc)?;
+        self.extent.encode_partial(enc)?;
         Ok(())
     }
 }
@@ -25300,6 +25422,11 @@ impl VkImageCopy {
     }
 
     pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        let _ = VkImageSubresourceLayers::decode_partial(dec)?;
+        let _ = VkOffset3D::decode_partial(dec)?;
+        let _ = VkImageSubresourceLayers::decode_partial(dec)?;
+        let _ = VkOffset3D::decode_partial(dec)?;
+        let _ = VkExtent3D::decode_partial(dec)?;
         Ok(Self::default())
     }
 
@@ -25313,6 +25440,11 @@ impl VkImageCopy {
     }
 
     pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.src_subresource.encode_partial(enc)?;
+        self.src_offset.encode_partial(enc)?;
+        self.dst_subresource.encode_partial(enc)?;
+        self.dst_offset.encode_partial(enc)?;
+        self.extent.encode_partial(enc)?;
         Ok(())
     }
 }
@@ -25355,6 +25487,12 @@ impl VkImageBlit {
     }
 
     pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        let _ = VkImageSubresourceLayers::decode_partial(dec)?;
+        let _sz = dec.read_array_size(2 as u64)?;
+        for _ in 0.._sz { let _ = VkOffset3D::decode_partial(dec)?; }
+        let _ = VkImageSubresourceLayers::decode_partial(dec)?;
+        let _sz = dec.read_array_size(2 as u64)?;
+        for _ in 0.._sz { let _ = VkOffset3D::decode_partial(dec)?; }
         Ok(Self::default())
     }
 
@@ -25369,6 +25507,12 @@ impl VkImageBlit {
     }
 
     pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.src_subresource.encode_partial(enc)?;
+        enc.write_array_size(2 as u64)?;
+        for item in &self.src_offsets { item.encode_partial(enc)?; }
+        self.dst_subresource.encode_partial(enc)?;
+        enc.write_array_size(2 as u64)?;
+        for item in &self.dst_offsets { item.encode_partial(enc)?; }
         Ok(())
     }
 }
@@ -25402,6 +25546,9 @@ impl VkBufferImageCopy {
     }
 
     pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        let _ = VkImageSubresourceLayers::decode_partial(dec)?;
+        let _ = VkOffset3D::decode_partial(dec)?;
+        let _ = VkExtent3D::decode_partial(dec)?;
         Ok(Self::default())
     }
 
@@ -25416,6 +25563,9 @@ impl VkBufferImageCopy {
     }
 
     pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.image_subresource.encode_partial(enc)?;
+        self.image_offset.encode_partial(enc)?;
+        self.image_extent.encode_partial(enc)?;
         Ok(())
     }
 }
@@ -25486,6 +25636,7 @@ impl VkCopyMemoryIndirectInfoKHR {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkStridedDeviceAddressRangeKHR::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -25512,6 +25663,7 @@ impl VkCopyMemoryIndirectInfoKHR {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.copy_address_range.encode_partial(enc)?;
         Ok(())
     }
 
@@ -25561,6 +25713,7 @@ impl VkCopyMemoryToImageIndirectInfoKHR {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkStridedDeviceAddressRangeKHR::decode_partial(dec)?;
         let _ = dec.read_array_size_unchecked()?;
         let mut out = Self::default();
         out.s_type = s_type;
@@ -25591,6 +25744,7 @@ impl VkCopyMemoryToImageIndirectInfoKHR {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.copy_address_range.encode_partial(enc)?;
         enc.write_array_size(self.p_image_subresources.len() as u64)?;
         Ok(())
     }
@@ -25628,6 +25782,11 @@ impl VkImageResolve {
     }
 
     pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        let _ = VkImageSubresourceLayers::decode_partial(dec)?;
+        let _ = VkOffset3D::decode_partial(dec)?;
+        let _ = VkImageSubresourceLayers::decode_partial(dec)?;
+        let _ = VkOffset3D::decode_partial(dec)?;
+        let _ = VkExtent3D::decode_partial(dec)?;
         Ok(Self::default())
     }
 
@@ -25641,6 +25800,11 @@ impl VkImageResolve {
     }
 
     pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.src_subresource.encode_partial(enc)?;
+        self.src_offset.encode_partial(enc)?;
+        self.dst_subresource.encode_partial(enc)?;
+        self.dst_offset.encode_partial(enc)?;
+        self.extent.encode_partial(enc)?;
         Ok(())
     }
 }
@@ -26616,6 +26780,7 @@ impl VkComputePipelineCreateInfo {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, p_next: Vec<VkComputePipelineCreateInfoPNext>) -> Result<Self, WireError> {
+        let _ = VkPipelineShaderStageCreateInfo::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         out.p_next = p_next;
@@ -26644,6 +26809,7 @@ impl VkComputePipelineCreateInfo {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.stage.encode_partial(enc)?;
         Ok(())
     }
 
@@ -27987,6 +28153,8 @@ impl VkPipelineDepthStencilStateCreateInfo {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkStencilOpState::decode_partial(dec)?;
+        let _ = VkStencilOpState::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -28019,6 +28187,8 @@ impl VkPipelineDepthStencilStateCreateInfo {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.front.encode_partial(enc)?;
+        self.back.encode_partial(enc)?;
         Ok(())
     }
 
@@ -29905,6 +30075,7 @@ impl VkRenderPassBeginInfo {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, p_next: Vec<VkRenderPassBeginInfoPNext>) -> Result<Self, WireError> {
+        let _ = VkRect2D::decode_partial(dec)?;
         let _ = dec.read_array_size_unchecked()?;
         let mut out = Self::default();
         out.s_type = s_type;
@@ -29935,6 +30106,7 @@ impl VkRenderPassBeginInfo {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.render_area.encode_partial(enc)?;
         enc.write_array_size(self.p_clear_values.len() as u64)?;
         Ok(())
     }
@@ -31527,6 +31699,7 @@ impl VkSwapchainCreateInfoKHR {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, p_next: Vec<VkSwapchainCreateInfoKHRPNext>) -> Result<Self, WireError> {
+        let _ = VkExtent2D::decode_partial(dec)?;
         let _ = dec.read_array_size_unchecked()?;
         let mut out = Self::default();
         out.s_type = s_type;
@@ -31568,6 +31741,7 @@ impl VkSwapchainCreateInfoKHR {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.image_extent.encode_partial(enc)?;
         enc.write_array_size(self.p_queue_family_indices.len() as u64)?;
         Ok(())
     }
@@ -32940,6 +33114,7 @@ impl VkSampleLocationsInfoEXT {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkExtent2D::decode_partial(dec)?;
         let _ = dec.read_array_size_unchecked()?;
         let mut out = Self::default();
         out.s_type = s_type;
@@ -32968,6 +33143,7 @@ impl VkSampleLocationsInfoEXT {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.sample_location_grid_size.encode_partial(enc)?;
         enc.write_array_size(self.p_sample_locations.len() as u64)?;
         Ok(())
     }
@@ -32996,6 +33172,7 @@ impl VkAttachmentSampleLocationsEXT {
     }
 
     pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        let _ = VkSampleLocationsInfoEXT::decode_partial(dec)?;
         Ok(Self::default())
     }
 
@@ -33006,6 +33183,7 @@ impl VkAttachmentSampleLocationsEXT {
     }
 
     pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.sample_locations_info.encode_partial(enc)?;
         Ok(())
     }
 }
@@ -33027,6 +33205,7 @@ impl VkSubpassSampleLocationsEXT {
     }
 
     pub fn decode_partial(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        let _ = VkSampleLocationsInfoEXT::decode_partial(dec)?;
         Ok(Self::default())
     }
 
@@ -33037,6 +33216,7 @@ impl VkSubpassSampleLocationsEXT {
     }
 
     pub fn encode_partial<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.sample_locations_info.encode_partial(enc)?;
         Ok(())
     }
 }
@@ -33143,6 +33323,7 @@ impl VkPipelineSampleLocationsStateCreateInfoEXT {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkSampleLocationsInfoEXT::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -33167,6 +33348,7 @@ impl VkPipelineSampleLocationsStateCreateInfoEXT {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.sample_locations_info.encode_partial(enc)?;
         Ok(())
     }
 
@@ -33226,6 +33408,7 @@ impl VkPhysicalDeviceSampleLocationsPropertiesEXT {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkExtent2D::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -33254,6 +33437,7 @@ impl VkPhysicalDeviceSampleLocationsPropertiesEXT {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.max_sample_location_grid_size.encode_partial(enc)?;
         Ok(())
     }
 
@@ -33286,6 +33470,7 @@ impl VkMultisamplePropertiesEXT {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkExtent2D::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -33309,6 +33494,7 @@ impl VkMultisamplePropertiesEXT {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.max_sample_location_grid_size.encode_partial(enc)?;
         Ok(())
     }
 
@@ -38059,6 +38245,7 @@ impl VkPhysicalDeviceVulkan12Properties {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkConformanceVersion::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -38135,6 +38322,7 @@ impl VkPhysicalDeviceVulkan12Properties {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.conformance_version.encode_partial(enc)?;
         Ok(())
     }
 
@@ -39017,6 +39205,7 @@ impl VkSamplerBorderColorComponentMappingCreateInfoEXT {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkComponentMapping::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -39041,6 +39230,7 @@ impl VkSamplerBorderColorComponentMappingCreateInfoEXT {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.components.encode_partial(enc)?;
         Ok(())
     }
 
@@ -40596,6 +40786,7 @@ impl VkFragmentShadingRateAttachmentInfoKHR {
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
         let _ = dec.read_simple_pointer()?;
+        let _ = VkExtent2D::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -40624,6 +40815,7 @@ impl VkFragmentShadingRateAttachmentInfoKHR {
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
         enc.write_simple_pointer(self.p_fragment_shading_rate_attachment.is_some())?;
+        self.shading_rate_attachment_texel_size.encode_partial(enc)?;
         Ok(())
     }
 
@@ -40671,6 +40863,7 @@ impl VkPipelineFragmentShadingRateStateCreateInfoKHR {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkExtent2D::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -40696,6 +40889,7 @@ impl VkPipelineFragmentShadingRateStateCreateInfoKHR {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.fragment_size.encode_partial(enc)?;
         Ok(())
     }
 
@@ -40839,6 +41033,9 @@ impl VkPhysicalDeviceFragmentShadingRatePropertiesKHR {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkExtent2D::decode_partial(dec)?;
+        let _ = VkExtent2D::decode_partial(dec)?;
+        let _ = VkExtent2D::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -40878,6 +41075,9 @@ impl VkPhysicalDeviceFragmentShadingRatePropertiesKHR {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.min_fragment_shading_rate_attachment_texel_size.encode_partial(enc)?;
+        self.max_fragment_shading_rate_attachment_texel_size.encode_partial(enc)?;
+        self.max_fragment_size.encode_partial(enc)?;
         Ok(())
     }
 
@@ -40913,6 +41113,7 @@ impl VkPhysicalDeviceFragmentShadingRateKHR {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkExtent2D::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -40937,6 +41138,7 @@ impl VkPhysicalDeviceFragmentShadingRateKHR {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.fragment_size.encode_partial(enc)?;
         Ok(())
     }
 
@@ -42774,6 +42976,7 @@ impl VkVideoFormatPropertiesKHR {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkComponentMapping::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -42802,6 +43005,7 @@ impl VkVideoFormatPropertiesKHR {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.component_mapping.encode_partial(enc)?;
         Ok(())
     }
 
@@ -42921,6 +43125,10 @@ impl VkVideoCapabilitiesKHR {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, p_next: Vec<VkVideoCapabilitiesKHRPNext>) -> Result<Self, WireError> {
+        let _ = VkExtent2D::decode_partial(dec)?;
+        let _ = VkExtent2D::decode_partial(dec)?;
+        let _ = VkExtent2D::decode_partial(dec)?;
+        let _ = VkExtensionProperties::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         out.p_next = p_next;
@@ -42953,6 +43161,10 @@ impl VkVideoCapabilitiesKHR {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.picture_access_granularity.encode_partial(enc)?;
+        self.min_coded_extent.encode_partial(enc)?;
+        self.max_coded_extent.encode_partial(enc)?;
+        self.std_header_version.encode_partial(enc)?;
         Ok(())
     }
 
@@ -42988,6 +43200,7 @@ impl VkVideoSessionMemoryRequirementsKHR {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkMemoryRequirements::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -43012,6 +43225,7 @@ impl VkVideoSessionMemoryRequirementsKHR {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.memory_requirements.encode_partial(enc)?;
         Ok(())
     }
 
@@ -43120,6 +43334,8 @@ impl VkVideoPictureResourceInfoKHR {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkOffset2D::decode_partial(dec)?;
+        let _ = VkExtent2D::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -43146,6 +43362,8 @@ impl VkVideoPictureResourceInfoKHR {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.coded_offset.encode_partial(enc)?;
+        self.coded_extent.encode_partial(enc)?;
         Ok(())
     }
 
@@ -43375,6 +43593,7 @@ impl VkVideoDecodeInfoKHR {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkVideoPictureResourceInfoKHR::decode_partial(dec)?;
         let _ = dec.read_simple_pointer()?;
         let _ = dec.read_array_size_unchecked()?;
         let mut out = Self::default();
@@ -43411,6 +43630,7 @@ impl VkVideoDecodeInfoKHR {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.dst_picture_resource.encode_partial(enc)?;
         enc.write_simple_pointer(self.p_setup_reference_slot.is_some())?;
         enc.write_array_size(self.p_reference_slots.len() as u64)?;
         Ok(())
@@ -43600,6 +43820,7 @@ impl VkVideoSessionCreateInfoKHR {
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
         let _ = dec.read_simple_pointer()?;
+        let _ = VkExtent2D::decode_partial(dec)?;
         let _ = dec.read_simple_pointer()?;
         let mut out = Self::default();
         out.s_type = s_type;
@@ -43639,6 +43860,7 @@ impl VkVideoSessionCreateInfoKHR {
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
         enc.write_simple_pointer(self.p_video_profile.is_some())?;
+        self.max_coded_extent.encode_partial(enc)?;
         enc.write_simple_pointer(self.p_std_header_version.is_some())?;
         Ok(())
     }
@@ -45338,6 +45560,7 @@ impl VkRenderingFragmentShadingRateAttachmentInfoKHR {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkExtent2D::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -45363,6 +45586,7 @@ impl VkRenderingFragmentShadingRateAttachmentInfoKHR {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.shading_rate_attachment_texel_size.encode_partial(enc)?;
         Ok(())
     }
 
@@ -47614,6 +47838,7 @@ impl VkTexelBufferDescriptorInfoEXT {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkDeviceAddressRangeKHR::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -47638,6 +47863,7 @@ impl VkTexelBufferDescriptorInfoEXT {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.address_range.encode_partial(enc)?;
         Ok(())
     }
 
@@ -48619,6 +48845,9 @@ impl VkCopyImageToMemoryInfoMESA {
     }
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        let _ = VkImageSubresourceLayers::decode_partial(dec)?;
+        let _ = VkOffset3D::decode_partial(dec)?;
+        let _ = VkExtent3D::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -48649,6 +48878,9 @@ impl VkCopyImageToMemoryInfoMESA {
     }
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        self.image_subresource.encode_partial(enc)?;
+        self.image_offset.encode_partial(enc)?;
+        self.image_extent.encode_partial(enc)?;
         Ok(())
     }
 
@@ -48701,6 +48933,9 @@ impl VkMemoryToImageCopyMESA {
 
     pub fn decode_partial_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
         let _ = dec.read_array_size_unchecked()?;
+        let _ = VkImageSubresourceLayers::decode_partial(dec)?;
+        let _ = VkOffset3D::decode_partial(dec)?;
+        let _ = VkExtent3D::decode_partial(dec)?;
         let mut out = Self::default();
         out.s_type = s_type;
         Ok(out)
@@ -48732,6 +48967,9 @@ impl VkMemoryToImageCopyMESA {
 
     pub fn encode_partial_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
         enc.write_array_size(self.p_data.len() as u64)?;
+        self.image_subresource.encode_partial(enc)?;
+        self.image_offset.encode_partial(enc)?;
+        self.image_extent.encode_partial(enc)?;
         Ok(())
     }
 

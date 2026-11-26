@@ -347,12 +347,20 @@ def emit_struct_decode_member(
         return lines
 
     if partial:
-        # Partial out-struct: only array sizes / pointers / sType / pNext are decoded; scalars are skipped
-        if var.ty.is_pointer():
+        # Partial out-struct: only array sizes / pointers / nested structs / sType / pNext are decoded
+        if var.ty.is_static_array() and var.ty.base.category == var.ty.base.STRUCT:
+            dim = var.ty.decor.dim
+            lines.append(
+                f"{indent}let _sz = dec.read_array_size({dim} as u64)?;\n"
+                f"{indent}for _ in 0.._sz {{ let _ = {var.ty.base.name}::decode_partial(dec)?; }}\n"
+            )
+        elif var.ty.is_pointer():
             if var.is_dynamic_array():
                 lines.append(f"{indent}let _ = dec.read_array_size_unchecked()?;\n")
             else:
                 lines.append(f"{indent}let _ = dec.read_simple_pointer()?;\n")
+        elif var.ty.base.category == var.ty.base.STRUCT:
+            lines.append(f"{indent}let _ = {var.ty.base.name}::decode_partial(dec)?;\n")
         return lines
 
     return emit_struct_decode_member_uncond(ty, var, vars_map, indent)
@@ -473,13 +481,21 @@ def emit_struct_encode_member(
         return lines
 
     if partial:
-        if var.ty.is_pointer():
+        if var.ty.is_static_array() and var.ty.base.category == var.ty.base.STRUCT:
+            dim = var.ty.decor.dim
+            lines.append(
+                f"{indent}enc.write_array_size({dim} as u64)?;\n"
+                f"{indent}for item in &{prefix}{fn} {{ item.encode_partial(enc)?; }}\n"
+            )
+        elif var.ty.is_pointer():
             if var.has_c_string() and var.ty.indirection_depth() == 1:
                 lines.append(f"{indent}enc.write_array_size({prefix}{fn}.as_ref().map_or(0, |s| s.len() + 1) as u64)?;\n")
             elif var.is_dynamic_array():
                 lines.append(f"{indent}enc.write_array_size({prefix}{fn}.len() as u64)?;\n")
             else:
                 lines.append(f"{indent}enc.write_simple_pointer({prefix}{fn}.is_some())?;\n")
+        elif var.ty.base.category == var.ty.base.STRUCT:
+            lines.append(f"{indent}{prefix}{fn}.encode_partial(enc)?;\n")
         return lines
 
     return emit_struct_encode_member_uncond(ty, var, vars_map, prefix, indent)
