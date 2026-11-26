@@ -8,6 +8,9 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "upstream"))
 
 from vkxml import VkExtension, VkRegistry, VkType  # noqa: E402
+from emit_protocol import emit_api_constants, fixup_registry  # noqa: E402
+from emit_structs_cmds import emit_types_rs  # noqa: E402
+from emit_commands import emit_commands_rs, emit_dispatch_rs  # noqa: E402
 
 VK_XML_EXTENSION_LIST = [
     # Venus extensions
@@ -439,15 +442,27 @@ def emit_info(reg: VkRegistry) -> str:
 def emit_mod() -> str:
     return (
         BANNER
-        + "#![allow(non_camel_case_types, non_snake_case, non_upper_case_globals, unused_imports, clippy::all)]\n\n"
+        + "#![allow(non_camel_case_types, non_snake_case, non_upper_case_globals, unused_imports, unused_variables, unreachable_patterns, clippy::all)]\n\n"
         + "pub mod constants;\n"
         + "pub mod enums;\n"
         + "pub mod handles;\n"
-        + "pub mod info;\n\n"
+        + "pub mod info;\n"
+        + '#[cfg(feature = "alloc")]\n'
+        + "pub mod types;\n"
+        + '#[cfg(feature = "alloc")]\n'
+        + "pub mod commands;\n"
+        + '#[cfg(feature = "alloc")]\n'
+        + "pub mod dispatch;\n\n"
         + "pub use constants::*;\n"
         + "pub use enums::*;\n"
         + "pub use handles::*;\n"
         + "pub use info::*;\n"
+        + '#[cfg(feature = "alloc")]\n'
+        + "pub use types::*;\n"
+        + '#[cfg(feature = "alloc")]\n'
+        + "pub use commands::*;\n"
+        + '#[cfg(feature = "alloc")]\n'
+        + "pub use dispatch::*;\n"
     )
 
 
@@ -461,14 +476,19 @@ def main() -> None:
         ],
     )
     supported = get_supported_types(reg)
+    reg = fixup_registry(reg, supported)
+    supported = get_supported_types(reg)
     out_dir = ROOT / "src" / "generated"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     (out_dir / "mod.rs").write_text(emit_mod(), encoding="utf-8")
-    (out_dir / "constants.rs").write_text(emit_constants(reg, supported), encoding="utf-8")
+    (out_dir / "constants.rs").write_text(emit_api_constants(xml_dir / "vk.xml"), encoding="utf-8")
     (out_dir / "enums.rs").write_text(emit_enums(reg, supported), encoding="utf-8")
     (out_dir / "handles.rs").write_text(emit_handles(reg, supported), encoding="utf-8")
     (out_dir / "info.rs").write_text(emit_info(reg), encoding="utf-8")
+    (out_dir / "types.rs").write_text(emit_types_rs(reg, supported), encoding="utf-8")
+    (out_dir / "commands.rs").write_text(emit_commands_rs(reg, supported), encoding="utf-8")
+    (out_dir / "dispatch.rs").write_text(emit_dispatch_rs(reg, supported), encoding="utf-8")
     print(f"Generated src/generated/ ({len(supported)} supported types)")
 
 
