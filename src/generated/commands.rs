@@ -5775,6 +5775,7 @@ pub struct VkCmdSetBlendConstantsRequest {
 impl VkCmdSetBlendConstantsRequest {
     pub fn decode(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
         let command_buffer = VkCommandBuffer::decode(dec)?;
+        dec.read_array_size(4 as u64)?;
         let mut blend_constants = core::array::from_fn(|_| Default::default());
         for item in &mut blend_constants { *item = dec.read_f32()?; }
         Ok(Self {
@@ -5786,6 +5787,7 @@ impl VkCmdSetBlendConstantsRequest {
     pub fn encode<S: WireSink>(&self, enc: &mut Encoder<S>, flags: CommandFlags) -> Result<(), WireError> {
         enc.write_command_header(CommandHeader { cmd_type: VkCommandTypeEXT::VK_COMMAND_TYPE_vkCmdSetBlendConstants_EXT.0, flags })?;
         (self.command_buffer).encode(enc)?;
+        enc.write_array_size(4 as u64)?;
         for item in &self.blend_constants { enc.write_f32(*item)? }
         Ok(())
     }
@@ -15623,6 +15625,7 @@ impl VkCmdSetFragmentShadingRateKHRRequest {
     pub fn decode(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
         let command_buffer = VkCommandBuffer::decode(dec)?;
         let p_fragment_size = if dec.read_simple_pointer()? { Some(Box::new(VkExtent2D::decode(dec)?)) } else { None };
+        dec.read_array_size(2 as u64)?;
         let mut combiner_ops = core::array::from_fn(|_| Default::default());
         for item in &mut combiner_ops { *item = VkFragmentShadingRateCombinerOpKHR::decode(dec)?; }
         Ok(Self {
@@ -15639,6 +15642,7 @@ impl VkCmdSetFragmentShadingRateKHRRequest {
             None => enc.write_simple_pointer(false)?,
             Some(v) => { enc.write_simple_pointer(true)?; (v).encode(enc)?; }
         }
+        enc.write_array_size(2 as u64)?;
         for item in &self.combiner_ops { (*item).encode(enc)? }
         Ok(())
     }

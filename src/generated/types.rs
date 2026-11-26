@@ -70,16 +70,19 @@ impl VkClearColorValue {
         let tag = dec.read_u32()?;
         match tag {
             0 => {
+                dec.read_array_size(4 as u64)?;
                 let mut float32 = core::array::from_fn(|_| Default::default());
                 for item in &mut float32 { *item = dec.read_f32()?; }
                 Ok(Self::Float32(float32))
             }
             1 => {
+                dec.read_array_size(4 as u64)?;
                 let mut int32 = core::array::from_fn(|_| Default::default());
                 for item in &mut int32 { *item = dec.read_i32()?; }
                 Ok(Self::Int32(int32))
             }
             2 => {
+                dec.read_array_size(4 as u64)?;
                 let mut uint32 = core::array::from_fn(|_| Default::default());
                 for item in &mut uint32 { *item = dec.read_u32()?; }
                 Ok(Self::Uint32(uint32))
@@ -93,18 +96,21 @@ impl VkClearColorValue {
             Self::Float32(val) => {
                 enc.write_u32(0)?;
                 let float32 = val;
+                enc.write_array_size(4 as u64)?;
                 for item in float32 { enc.write_f32(*item)? }
                 Ok(())
             }
             Self::Int32(val) => {
                 enc.write_u32(1)?;
                 let int32 = val;
+                enc.write_array_size(4 as u64)?;
                 for item in int32 { enc.write_i32(*item)? }
                 Ok(())
             }
             Self::Uint32(val) => {
                 enc.write_u32(2)?;
                 let uint32 = val;
+                enc.write_array_size(4 as u64)?;
                 for item in uint32 { enc.write_u32(*item)? }
                 Ok(())
             }
@@ -3128,8 +3134,10 @@ impl Default for VkPhysicalDeviceDriverProperties {
 impl VkPhysicalDeviceDriverProperties {
     pub fn decode_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
         let driver_id = VkDriverId::decode(dec)?;
+        dec.read_array_size(VK_MAX_DRIVER_NAME_SIZE as u64)?;
         let mut driver_name = [0u8; VK_MAX_DRIVER_NAME_SIZE];
         driver_name.copy_from_slice(dec.read_blob(VK_MAX_DRIVER_NAME_SIZE)?);
+        dec.read_array_size(VK_MAX_DRIVER_INFO_SIZE as u64)?;
         let mut driver_info = [0u8; VK_MAX_DRIVER_INFO_SIZE];
         driver_info.copy_from_slice(dec.read_blob(VK_MAX_DRIVER_INFO_SIZE)?);
         let conformance_version = VkConformanceVersion::decode(dec)?;
@@ -3158,7 +3166,9 @@ impl VkPhysicalDeviceDriverProperties {
 
     pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
         (self.driver_id).encode(enc)?;
+        enc.write_array_size(VK_MAX_DRIVER_NAME_SIZE as u64)?;
         enc.write_blob(&self.driver_name)?;
+        enc.write_array_size(VK_MAX_DRIVER_INFO_SIZE as u64)?;
         enc.write_blob(&self.driver_info)?;
         (self.conformance_version).encode(enc)?;
         Ok(())
@@ -3520,12 +3530,15 @@ impl Default for VkPhysicalDeviceIDProperties {
 
 impl VkPhysicalDeviceIDProperties {
     pub fn decode_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
-        let mut device_uuid = core::array::from_fn(|_| Default::default());
-        for item in &mut device_uuid { *item = dec.read_u8()?; }
-        let mut driver_uuid = core::array::from_fn(|_| Default::default());
-        for item in &mut driver_uuid { *item = dec.read_u8()?; }
-        let mut device_luid = core::array::from_fn(|_| Default::default());
-        for item in &mut device_luid { *item = dec.read_u8()?; }
+        dec.read_array_size(VK_UUID_SIZE as u64)?;
+        let mut device_uuid = [0u8; VK_UUID_SIZE];
+        device_uuid.copy_from_slice(dec.read_u8_slice(VK_UUID_SIZE)?);
+        dec.read_array_size(VK_UUID_SIZE as u64)?;
+        let mut driver_uuid = [0u8; VK_UUID_SIZE];
+        driver_uuid.copy_from_slice(dec.read_u8_slice(VK_UUID_SIZE)?);
+        dec.read_array_size(VK_LUID_SIZE as u64)?;
+        let mut device_luid = [0u8; VK_LUID_SIZE];
+        device_luid.copy_from_slice(dec.read_u8_slice(VK_LUID_SIZE)?);
         let device_node_mask = dec.read_u32()?;
         let device_luid_valid = dec.read_u32()?;
         Ok(Self {
@@ -3553,9 +3566,12 @@ impl VkPhysicalDeviceIDProperties {
     }
 
     pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
-        for item in &self.device_uuid { enc.write_u8(*item)? }
-        for item in &self.driver_uuid { enc.write_u8(*item)? }
-        for item in &self.device_luid { enc.write_u8(*item)? }
+        enc.write_array_size(VK_UUID_SIZE as u64)?;
+        enc.write_u8_slice(&self.device_uuid)?;
+        enc.write_array_size(VK_UUID_SIZE as u64)?;
+        enc.write_u8_slice(&self.driver_uuid)?;
+        enc.write_array_size(VK_LUID_SIZE as u64)?;
+        enc.write_u8_slice(&self.device_luid)?;
         enc.write_u32(self.device_node_mask)?;
         enc.write_u32(self.device_luid_valid)?;
         Ok(())
@@ -4259,6 +4275,7 @@ impl Default for VkPhysicalDeviceGroupProperties {
 impl VkPhysicalDeviceGroupProperties {
     pub fn decode_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
         let physical_device_count = dec.read_u32()?;
+        dec.read_array_size(VK_MAX_DEVICE_GROUP_SIZE as u64)?;
         let mut physical_devices = core::array::from_fn(|_| Default::default());
         for item in &mut physical_devices { *item = VkPhysicalDevice::decode(dec)?; }
         let subset_allocation = dec.read_u32()?;
@@ -4286,6 +4303,7 @@ impl VkPhysicalDeviceGroupProperties {
 
     pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
         enc.write_u32(self.physical_device_count)?;
+        enc.write_array_size(VK_MAX_DEVICE_GROUP_SIZE as u64)?;
         for item in &self.physical_devices { (*item).encode(enc)? }
         enc.write_u32(self.subset_allocation)?;
         Ok(())
@@ -7530,6 +7548,7 @@ impl Default for VkQueueFamilyGlobalPriorityProperties {
 impl VkQueueFamilyGlobalPriorityProperties {
     pub fn decode_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
         let priority_count = dec.read_u32()?;
+        dec.read_array_size(VK_MAX_GLOBAL_PRIORITY_SIZE as u64)?;
         let mut priorities = core::array::from_fn(|_| Default::default());
         for item in &mut priorities { *item = VkQueueGlobalPriority::decode(dec)?; }
         Ok(Self {
@@ -7555,6 +7574,7 @@ impl VkQueueFamilyGlobalPriorityProperties {
 
     pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
         enc.write_u32(self.priority_count)?;
+        enc.write_array_size(VK_MAX_GLOBAL_PRIORITY_SIZE as u64)?;
         for item in &self.priorities { (*item).encode(enc)? }
         Ok(())
     }
@@ -11168,13 +11188,17 @@ impl Default for VkPhysicalDeviceToolProperties {
 
 impl VkPhysicalDeviceToolProperties {
     pub fn decode_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        dec.read_array_size(VK_MAX_EXTENSION_NAME_SIZE as u64)?;
         let mut name = [0u8; VK_MAX_EXTENSION_NAME_SIZE];
         name.copy_from_slice(dec.read_blob(VK_MAX_EXTENSION_NAME_SIZE)?);
+        dec.read_array_size(VK_MAX_EXTENSION_NAME_SIZE as u64)?;
         let mut version = [0u8; VK_MAX_EXTENSION_NAME_SIZE];
         version.copy_from_slice(dec.read_blob(VK_MAX_EXTENSION_NAME_SIZE)?);
         let purposes = dec.read_u32()?;
+        dec.read_array_size(VK_MAX_DESCRIPTION_SIZE as u64)?;
         let mut description = [0u8; VK_MAX_DESCRIPTION_SIZE];
         description.copy_from_slice(dec.read_blob(VK_MAX_DESCRIPTION_SIZE)?);
+        dec.read_array_size(VK_MAX_EXTENSION_NAME_SIZE as u64)?;
         let mut layer = [0u8; VK_MAX_EXTENSION_NAME_SIZE];
         layer.copy_from_slice(dec.read_blob(VK_MAX_EXTENSION_NAME_SIZE)?);
         Ok(Self {
@@ -11202,10 +11226,14 @@ impl VkPhysicalDeviceToolProperties {
     }
 
     pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        enc.write_array_size(VK_MAX_EXTENSION_NAME_SIZE as u64)?;
         enc.write_blob(&self.name)?;
+        enc.write_array_size(VK_MAX_EXTENSION_NAME_SIZE as u64)?;
         enc.write_blob(&self.version)?;
         enc.write_u32(self.purposes)?;
+        enc.write_array_size(VK_MAX_DESCRIPTION_SIZE as u64)?;
         enc.write_blob(&self.description)?;
+        enc.write_array_size(VK_MAX_EXTENSION_NAME_SIZE as u64)?;
         enc.write_blob(&self.layer)?;
         Ok(())
     }
@@ -11277,8 +11305,9 @@ pub struct VkTransformMatrixKHR {
 
 impl VkTransformMatrixKHR {
     pub fn decode(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        dec.read_array_size(3)?;
         let mut matrix = [[0.0_f32; 4]; 3];
-        for row in &mut matrix { for cell in row { *cell = dec.read_f32()?; } }
+        for row in &mut matrix { dec.read_array_size(4)?; for cell in row { *cell = dec.read_f32()?; } }
         Ok(Self {
             matrix,
         })
@@ -11289,7 +11318,8 @@ impl VkTransformMatrixKHR {
     }
 
     pub fn encode<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
-        for row in &self.matrix { for &cell in row { enc.write_f32(cell)?; } }
+        enc.write_array_size(3)?;
+        for row in &self.matrix { enc.write_array_size(4)?; for &cell in row { enc.write_f32(cell)?; } }
         Ok(())
     }
 
@@ -11687,9 +11717,11 @@ impl Default for VkImageBlit2 {
 impl VkImageBlit2 {
     pub fn decode_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
         let src_subresource = VkImageSubresourceLayers::decode(dec)?;
+        dec.read_array_size(2 as u64)?;
         let mut src_offsets = core::array::from_fn(|_| Default::default());
         for item in &mut src_offsets { *item = VkOffset3D::decode(dec)?; }
         let dst_subresource = VkImageSubresourceLayers::decode(dec)?;
+        dec.read_array_size(2 as u64)?;
         let mut dst_offsets = core::array::from_fn(|_| Default::default());
         for item in &mut dst_offsets { *item = VkOffset3D::decode(dec)?; }
         Ok(Self {
@@ -11717,8 +11749,10 @@ impl VkImageBlit2 {
 
     pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
         (self.src_subresource).encode(enc)?;
+        enc.write_array_size(2 as u64)?;
         for item in &self.src_offsets { (item).encode(enc)? }
         (self.dst_subresource).encode(enc)?;
+        enc.write_array_size(2 as u64)?;
         for item in &self.dst_offsets { (item).encode(enc)? }
         Ok(())
     }
@@ -13197,8 +13231,9 @@ impl VkPhysicalDeviceHostImageCopyProperties {
         let p_copy_dst_layouts_sz = dec.read_array_size_unchecked()?;
         let mut p_copy_dst_layouts = Vec::with_capacity(p_copy_dst_layouts_sz as usize);
         for _ in 0..p_copy_dst_layouts_sz { p_copy_dst_layouts.push(VkImageLayout::decode(dec)?); }
-        let mut optimal_tiling_layout_uuid = core::array::from_fn(|_| Default::default());
-        for item in &mut optimal_tiling_layout_uuid { *item = dec.read_u8()?; }
+        dec.read_array_size(VK_UUID_SIZE as u64)?;
+        let mut optimal_tiling_layout_uuid = [0u8; VK_UUID_SIZE];
+        optimal_tiling_layout_uuid.copy_from_slice(dec.read_u8_slice(VK_UUID_SIZE)?);
         let identical_memory_type_requirements = dec.read_u32()?;
         Ok(Self {
             s_type,
@@ -13234,7 +13269,8 @@ impl VkPhysicalDeviceHostImageCopyProperties {
         enc.write_u32(self.copy_dst_layout_count)?;
         enc.write_array_size(self.p_copy_dst_layouts.len() as u64)?;
         for item in &self.p_copy_dst_layouts { (*item).encode(enc)? }
-        for item in &self.optimal_tiling_layout_uuid { enc.write_u8(*item)? }
+        enc.write_array_size(VK_UUID_SIZE as u64)?;
+        enc.write_u8_slice(&self.optimal_tiling_layout_uuid)?;
         enc.write_u32(self.identical_memory_type_requirements)?;
         Ok(())
     }
@@ -15822,10 +15858,12 @@ impl VkPhysicalDeviceProperties {
         let vendor_id = dec.read_u32()?;
         let device_id = dec.read_u32()?;
         let device_type = VkPhysicalDeviceType::decode(dec)?;
+        dec.read_array_size(VK_MAX_PHYSICAL_DEVICE_NAME_SIZE as u64)?;
         let mut device_name = [0u8; VK_MAX_PHYSICAL_DEVICE_NAME_SIZE];
         device_name.copy_from_slice(dec.read_blob(VK_MAX_PHYSICAL_DEVICE_NAME_SIZE)?);
-        let mut pipeline_cache_uuid = core::array::from_fn(|_| Default::default());
-        for item in &mut pipeline_cache_uuid { *item = dec.read_u8()?; }
+        dec.read_array_size(VK_UUID_SIZE as u64)?;
+        let mut pipeline_cache_uuid = [0u8; VK_UUID_SIZE];
+        pipeline_cache_uuid.copy_from_slice(dec.read_u8_slice(VK_UUID_SIZE)?);
         let limits = VkPhysicalDeviceLimits::decode(dec)?;
         let sparse_properties = VkPhysicalDeviceSparseProperties::decode(dec)?;
         Ok(Self {
@@ -15851,8 +15889,10 @@ impl VkPhysicalDeviceProperties {
         enc.write_u32(self.vendor_id)?;
         enc.write_u32(self.device_id)?;
         (self.device_type).encode(enc)?;
+        enc.write_array_size(VK_MAX_PHYSICAL_DEVICE_NAME_SIZE as u64)?;
         enc.write_blob(&self.device_name)?;
-        for item in &self.pipeline_cache_uuid { enc.write_u8(*item)? }
+        enc.write_array_size(VK_UUID_SIZE as u64)?;
+        enc.write_u8_slice(&self.pipeline_cache_uuid)?;
         (self.limits).encode(enc)?;
         (self.sparse_properties).encode(enc)?;
         Ok(())
@@ -16140,9 +16180,11 @@ impl VkPhysicalDeviceLimits {
         let max_fragment_dual_src_attachments = dec.read_u32()?;
         let max_fragment_combined_output_resources = dec.read_u32()?;
         let max_compute_shared_memory_size = dec.read_u32()?;
+        dec.read_array_size(3 as u64)?;
         let mut max_compute_work_group_count = core::array::from_fn(|_| Default::default());
         for item in &mut max_compute_work_group_count { *item = dec.read_u32()?; }
         let max_compute_work_group_invocations = dec.read_u32()?;
+        dec.read_array_size(3 as u64)?;
         let mut max_compute_work_group_size = core::array::from_fn(|_| Default::default());
         for item in &mut max_compute_work_group_size { *item = dec.read_u32()?; }
         let sub_pixel_precision_bits = dec.read_u32()?;
@@ -16153,8 +16195,10 @@ impl VkPhysicalDeviceLimits {
         let max_sampler_lod_bias = dec.read_f32()?;
         let max_sampler_anisotropy = dec.read_f32()?;
         let max_viewports = dec.read_u32()?;
+        dec.read_array_size(2 as u64)?;
         let mut max_viewport_dimensions = core::array::from_fn(|_| Default::default());
         for item in &mut max_viewport_dimensions { *item = dec.read_u32()?; }
+        dec.read_array_size(2 as u64)?;
         let mut viewport_bounds_range = core::array::from_fn(|_| Default::default());
         for item in &mut viewport_bounds_range { *item = dec.read_f32()?; }
         let viewport_sub_pixel_bits = dec.read_u32()?;
@@ -16189,8 +16233,10 @@ impl VkPhysicalDeviceLimits {
         let max_cull_distances = dec.read_u32()?;
         let max_combined_clip_and_cull_distances = dec.read_u32()?;
         let discrete_queue_priorities = dec.read_u32()?;
+        dec.read_array_size(2 as u64)?;
         let mut point_size_range = core::array::from_fn(|_| Default::default());
         for item in &mut point_size_range { *item = dec.read_f32()?; }
+        dec.read_array_size(2 as u64)?;
         let mut line_width_range = core::array::from_fn(|_| Default::default());
         for item in &mut line_width_range { *item = dec.read_f32()?; }
         let point_size_granularity = dec.read_f32()?;
@@ -16367,8 +16413,10 @@ impl VkPhysicalDeviceLimits {
         enc.write_u32(self.max_fragment_dual_src_attachments)?;
         enc.write_u32(self.max_fragment_combined_output_resources)?;
         enc.write_u32(self.max_compute_shared_memory_size)?;
+        enc.write_array_size(3 as u64)?;
         for item in &self.max_compute_work_group_count { enc.write_u32(*item)? }
         enc.write_u32(self.max_compute_work_group_invocations)?;
+        enc.write_array_size(3 as u64)?;
         for item in &self.max_compute_work_group_size { enc.write_u32(*item)? }
         enc.write_u32(self.sub_pixel_precision_bits)?;
         enc.write_u32(self.sub_texel_precision_bits)?;
@@ -16378,7 +16426,9 @@ impl VkPhysicalDeviceLimits {
         enc.write_f32(self.max_sampler_lod_bias)?;
         enc.write_f32(self.max_sampler_anisotropy)?;
         enc.write_u32(self.max_viewports)?;
+        enc.write_array_size(2 as u64)?;
         for item in &self.max_viewport_dimensions { enc.write_u32(*item)? }
+        enc.write_array_size(2 as u64)?;
         for item in &self.viewport_bounds_range { enc.write_f32(*item)? }
         enc.write_u32(self.viewport_sub_pixel_bits)?;
         enc.write_size_t(self.min_memory_map_alignment)?;
@@ -16412,7 +16462,9 @@ impl VkPhysicalDeviceLimits {
         enc.write_u32(self.max_cull_distances)?;
         enc.write_u32(self.max_combined_clip_and_cull_distances)?;
         enc.write_u32(self.discrete_queue_priorities)?;
+        enc.write_array_size(2 as u64)?;
         for item in &self.point_size_range { enc.write_f32(*item)? }
+        enc.write_array_size(2 as u64)?;
         for item in &self.line_width_range { enc.write_f32(*item)? }
         enc.write_f32(self.point_size_granularity)?;
         enc.write_f32(self.line_width_granularity)?;
@@ -16489,6 +16541,7 @@ impl Default for VkExtensionProperties {
 
 impl VkExtensionProperties {
     pub fn decode(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        dec.read_array_size(VK_MAX_EXTENSION_NAME_SIZE as u64)?;
         let mut extension_name = [0u8; VK_MAX_EXTENSION_NAME_SIZE];
         extension_name.copy_from_slice(dec.read_blob(VK_MAX_EXTENSION_NAME_SIZE)?);
         let spec_version = dec.read_u32()?;
@@ -16503,6 +16556,7 @@ impl VkExtensionProperties {
     }
 
     pub fn encode<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        enc.write_array_size(VK_MAX_EXTENSION_NAME_SIZE as u64)?;
         enc.write_blob(&self.extension_name)?;
         enc.write_u32(self.spec_version)?;
         Ok(())
@@ -16534,10 +16588,12 @@ impl Default for VkLayerProperties {
 
 impl VkLayerProperties {
     pub fn decode(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
+        dec.read_array_size(VK_MAX_EXTENSION_NAME_SIZE as u64)?;
         let mut layer_name = [0u8; VK_MAX_EXTENSION_NAME_SIZE];
         layer_name.copy_from_slice(dec.read_blob(VK_MAX_EXTENSION_NAME_SIZE)?);
         let spec_version = dec.read_u32()?;
         let implementation_version = dec.read_u32()?;
+        dec.read_array_size(VK_MAX_DESCRIPTION_SIZE as u64)?;
         let mut description = [0u8; VK_MAX_DESCRIPTION_SIZE];
         description.copy_from_slice(dec.read_blob(VK_MAX_DESCRIPTION_SIZE)?);
         Ok(Self {
@@ -16553,9 +16609,11 @@ impl VkLayerProperties {
     }
 
     pub fn encode<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        enc.write_array_size(VK_MAX_EXTENSION_NAME_SIZE as u64)?;
         enc.write_blob(&self.layer_name)?;
         enc.write_u32(self.spec_version)?;
         enc.write_u32(self.implementation_version)?;
+        enc.write_array_size(VK_MAX_DESCRIPTION_SIZE as u64)?;
         enc.write_blob(&self.description)?;
         Ok(())
     }
@@ -18207,9 +18265,11 @@ impl Default for VkPhysicalDeviceMemoryProperties {
 impl VkPhysicalDeviceMemoryProperties {
     pub fn decode(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
         let memory_type_count = dec.read_u32()?;
+        dec.read_array_size(VK_MAX_MEMORY_TYPES as u64)?;
         let mut memory_types = core::array::from_fn(|_| Default::default());
         for item in &mut memory_types { *item = VkMemoryType::decode(dec)?; }
         let memory_heap_count = dec.read_u32()?;
+        dec.read_array_size(VK_MAX_MEMORY_HEAPS as u64)?;
         let mut memory_heaps = core::array::from_fn(|_| Default::default());
         for item in &mut memory_heaps { *item = VkMemoryHeap::decode(dec)?; }
         Ok(Self {
@@ -18226,8 +18286,10 @@ impl VkPhysicalDeviceMemoryProperties {
 
     pub fn encode<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
         enc.write_u32(self.memory_type_count)?;
+        enc.write_array_size(VK_MAX_MEMORY_TYPES as u64)?;
         for item in &self.memory_types { (item).encode(enc)? }
         enc.write_u32(self.memory_heap_count)?;
+        enc.write_array_size(VK_MAX_MEMORY_HEAPS as u64)?;
         for item in &self.memory_heaps { (item).encode(enc)? }
         Ok(())
     }
@@ -20361,9 +20423,11 @@ impl Default for VkImageBlit {
 impl VkImageBlit {
     pub fn decode(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
         let src_subresource = VkImageSubresourceLayers::decode(dec)?;
+        dec.read_array_size(2 as u64)?;
         let mut src_offsets = core::array::from_fn(|_| Default::default());
         for item in &mut src_offsets { *item = VkOffset3D::decode(dec)?; }
         let dst_subresource = VkImageSubresourceLayers::decode(dec)?;
+        dec.read_array_size(2 as u64)?;
         let mut dst_offsets = core::array::from_fn(|_| Default::default());
         for item in &mut dst_offsets { *item = VkOffset3D::decode(dec)?; }
         Ok(Self {
@@ -20380,8 +20444,10 @@ impl VkImageBlit {
 
     pub fn encode<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
         (self.src_subresource).encode(enc)?;
+        enc.write_array_size(2 as u64)?;
         for item in &self.src_offsets { (item).encode(enc)? }
         (self.dst_subresource).encode(enc)?;
+        enc.write_array_size(2 as u64)?;
         for item in &self.dst_offsets { (item).encode(enc)? }
         Ok(())
     }
@@ -22268,6 +22334,7 @@ impl VkPipelineColorBlendStateCreateInfo {
         let p_attachments_sz = dec.read_array_size_unchecked()?;
         let mut p_attachments = Vec::with_capacity(p_attachments_sz as usize);
         for _ in 0..p_attachments_sz { p_attachments.push(VkPipelineColorBlendAttachmentState::decode(dec)?); }
+        dec.read_array_size(4 as u64)?;
         let mut blend_constants = core::array::from_fn(|_| Default::default());
         for item in &mut blend_constants { *item = dec.read_f32()?; }
         Ok(Self {
@@ -22305,6 +22372,7 @@ impl VkPipelineColorBlendStateCreateInfo {
         enc.write_u32(self.attachment_count)?;
         enc.write_array_size(self.p_attachments.len() as u64)?;
         for item in &self.p_attachments { (item).encode(enc)? }
+        enc.write_array_size(4 as u64)?;
         for item in &self.blend_constants { enc.write_f32(*item)? }
         Ok(())
     }
@@ -22863,8 +22931,9 @@ impl VkPipelineCacheHeaderVersionOne {
         let header_version = VkPipelineCacheHeaderVersion::decode(dec)?;
         let vendor_id = dec.read_u32()?;
         let device_id = dec.read_u32()?;
-        let mut pipeline_cache_uuid = core::array::from_fn(|_| Default::default());
-        for item in &mut pipeline_cache_uuid { *item = dec.read_u8()?; }
+        dec.read_array_size(VK_UUID_SIZE as u64)?;
+        let mut pipeline_cache_uuid = [0u8; VK_UUID_SIZE];
+        pipeline_cache_uuid.copy_from_slice(dec.read_u8_slice(VK_UUID_SIZE)?);
         Ok(Self {
             header_size,
             header_version,
@@ -22883,7 +22952,8 @@ impl VkPipelineCacheHeaderVersionOne {
         (self.header_version).encode(enc)?;
         enc.write_u32(self.vendor_id)?;
         enc.write_u32(self.device_id)?;
-        for item in &self.pipeline_cache_uuid { enc.write_u8(*item)? }
+        enc.write_array_size(VK_UUID_SIZE as u64)?;
+        enc.write_u8_slice(&self.pipeline_cache_uuid)?;
         Ok(())
     }
 
@@ -23191,8 +23261,9 @@ impl Default for VkPipelineBinaryKeyKHR {
 impl VkPipelineBinaryKeyKHR {
     pub fn decode_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
         let key_size = dec.read_u32()?;
-        let mut key = core::array::from_fn(|_| Default::default());
-        for item in &mut key { *item = dec.read_u8()?; }
+        dec.read_array_size(VK_MAX_PIPELINE_BINARY_KEY_SIZE_KHR as u64)?;
+        let mut key = [0u8; VK_MAX_PIPELINE_BINARY_KEY_SIZE_KHR];
+        key.copy_from_slice(dec.read_u8_slice(VK_MAX_PIPELINE_BINARY_KEY_SIZE_KHR)?);
         Ok(Self {
             s_type,
             key_size,
@@ -23216,7 +23287,8 @@ impl VkPipelineBinaryKeyKHR {
 
     pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
         enc.write_u32(self.key_size)?;
-        for item in &self.key { enc.write_u8(*item)? }
+        enc.write_array_size(VK_MAX_PIPELINE_BINARY_KEY_SIZE_KHR as u64)?;
+        enc.write_u8_slice(&self.key)?;
         Ok(())
     }
 
@@ -25628,6 +25700,7 @@ impl Default for VkDeviceGroupPresentCapabilitiesKHR {
 
 impl VkDeviceGroupPresentCapabilitiesKHR {
     pub fn decode_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        dec.read_array_size(VK_MAX_DEVICE_GROUP_SIZE as u64)?;
         let mut present_mask = core::array::from_fn(|_| Default::default());
         for item in &mut present_mask { *item = dec.read_u32()?; }
         let modes = dec.read_u32()?;
@@ -25653,6 +25726,7 @@ impl VkDeviceGroupPresentCapabilitiesKHR {
     }
 
     pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        enc.write_array_size(VK_MAX_DEVICE_GROUP_SIZE as u64)?;
         for item in &self.present_mask { enc.write_u32(*item)? }
         enc.write_u32(self.modes)?;
         Ok(())
@@ -26790,6 +26864,7 @@ impl VkPhysicalDeviceSampleLocationsPropertiesEXT {
     pub fn decode_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
         let sample_location_sample_counts = dec.read_u32()?;
         let max_sample_location_grid_size = VkExtent2D::decode(dec)?;
+        dec.read_array_size(2 as u64)?;
         let mut sample_location_coordinate_range = core::array::from_fn(|_| Default::default());
         for item in &mut sample_location_coordinate_range { *item = dec.read_f32()?; }
         let sample_location_sub_pixel_bits = dec.read_u32()?;
@@ -26821,6 +26896,7 @@ impl VkPhysicalDeviceSampleLocationsPropertiesEXT {
     pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
         enc.write_u32(self.sample_location_sample_counts)?;
         (self.max_sample_location_grid_size).encode(enc)?;
+        enc.write_array_size(2 as u64)?;
         for item in &self.sample_location_coordinate_range { enc.write_f32(*item)? }
         enc.write_u32(self.sample_location_sub_pixel_bits)?;
         enc.write_u32(self.variable_sample_locations)?;
@@ -28210,18 +28286,22 @@ impl Default for VkPhysicalDeviceMeshShaderPropertiesEXT {
 impl VkPhysicalDeviceMeshShaderPropertiesEXT {
     pub fn decode_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
         let max_task_work_group_total_count = dec.read_u32()?;
+        dec.read_array_size(3 as u64)?;
         let mut max_task_work_group_count = core::array::from_fn(|_| Default::default());
         for item in &mut max_task_work_group_count { *item = dec.read_u32()?; }
         let max_task_work_group_invocations = dec.read_u32()?;
+        dec.read_array_size(3 as u64)?;
         let mut max_task_work_group_size = core::array::from_fn(|_| Default::default());
         for item in &mut max_task_work_group_size { *item = dec.read_u32()?; }
         let max_task_payload_size = dec.read_u32()?;
         let max_task_shared_memory_size = dec.read_u32()?;
         let max_task_payload_and_shared_memory_size = dec.read_u32()?;
         let max_mesh_work_group_total_count = dec.read_u32()?;
+        dec.read_array_size(3 as u64)?;
         let mut max_mesh_work_group_count = core::array::from_fn(|_| Default::default());
         for item in &mut max_mesh_work_group_count { *item = dec.read_u32()?; }
         let max_mesh_work_group_invocations = dec.read_u32()?;
+        dec.read_array_size(3 as u64)?;
         let mut max_mesh_work_group_size = core::array::from_fn(|_| Default::default());
         for item in &mut max_mesh_work_group_size { *item = dec.read_u32()?; }
         let max_mesh_shared_memory_size = dec.read_u32()?;
@@ -28290,15 +28370,19 @@ impl VkPhysicalDeviceMeshShaderPropertiesEXT {
 
     pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
         enc.write_u32(self.max_task_work_group_total_count)?;
+        enc.write_array_size(3 as u64)?;
         for item in &self.max_task_work_group_count { enc.write_u32(*item)? }
         enc.write_u32(self.max_task_work_group_invocations)?;
+        enc.write_array_size(3 as u64)?;
         for item in &self.max_task_work_group_size { enc.write_u32(*item)? }
         enc.write_u32(self.max_task_payload_size)?;
         enc.write_u32(self.max_task_shared_memory_size)?;
         enc.write_u32(self.max_task_payload_and_shared_memory_size)?;
         enc.write_u32(self.max_mesh_work_group_total_count)?;
+        enc.write_array_size(3 as u64)?;
         for item in &self.max_mesh_work_group_count { enc.write_u32(*item)? }
         enc.write_u32(self.max_mesh_work_group_invocations)?;
+        enc.write_array_size(3 as u64)?;
         for item in &self.max_mesh_work_group_size { enc.write_u32(*item)? }
         enc.write_u32(self.max_mesh_shared_memory_size)?;
         enc.write_u32(self.max_mesh_payload_and_shared_memory_size)?;
@@ -29694,8 +29778,10 @@ impl Default for VkPhysicalDeviceMemoryBudgetPropertiesEXT {
 
 impl VkPhysicalDeviceMemoryBudgetPropertiesEXT {
     pub fn decode_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        dec.read_array_size(VK_MAX_MEMORY_HEAPS as u64)?;
         let mut heap_budget = core::array::from_fn(|_| Default::default());
         for item in &mut heap_budget { *item = dec.read_u64()?; }
+        dec.read_array_size(VK_MAX_MEMORY_HEAPS as u64)?;
         let mut heap_usage = core::array::from_fn(|_| Default::default());
         for item in &mut heap_usage { *item = dec.read_u64()?; }
         Ok(Self {
@@ -29720,7 +29806,9 @@ impl VkPhysicalDeviceMemoryBudgetPropertiesEXT {
     }
 
     pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        enc.write_array_size(VK_MAX_MEMORY_HEAPS as u64)?;
         for item in &self.heap_budget { enc.write_u64(*item)? }
+        enc.write_array_size(VK_MAX_MEMORY_HEAPS as u64)?;
         for item in &self.heap_usage { enc.write_u64(*item)? }
         Ok(())
     }
@@ -30111,8 +30199,10 @@ impl Default for VkPipelineExecutablePropertiesKHR {
 impl VkPipelineExecutablePropertiesKHR {
     pub fn decode_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
         let stages = dec.read_u32()?;
+        dec.read_array_size(VK_MAX_DESCRIPTION_SIZE as u64)?;
         let mut name = [0u8; VK_MAX_DESCRIPTION_SIZE];
         name.copy_from_slice(dec.read_blob(VK_MAX_DESCRIPTION_SIZE)?);
+        dec.read_array_size(VK_MAX_DESCRIPTION_SIZE as u64)?;
         let mut description = [0u8; VK_MAX_DESCRIPTION_SIZE];
         description.copy_from_slice(dec.read_blob(VK_MAX_DESCRIPTION_SIZE)?);
         let subgroup_size = dec.read_u32()?;
@@ -30141,7 +30231,9 @@ impl VkPipelineExecutablePropertiesKHR {
 
     pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
         enc.write_u32(self.stages)?;
+        enc.write_array_size(VK_MAX_DESCRIPTION_SIZE as u64)?;
         enc.write_blob(&self.name)?;
+        enc.write_array_size(VK_MAX_DESCRIPTION_SIZE as u64)?;
         enc.write_blob(&self.description)?;
         enc.write_u32(self.subgroup_size)?;
         Ok(())
@@ -30234,8 +30326,10 @@ impl Default for VkPipelineExecutableStatisticKHR {
 
 impl VkPipelineExecutableStatisticKHR {
     pub fn decode_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        dec.read_array_size(VK_MAX_DESCRIPTION_SIZE as u64)?;
         let mut name = [0u8; VK_MAX_DESCRIPTION_SIZE];
         name.copy_from_slice(dec.read_blob(VK_MAX_DESCRIPTION_SIZE)?);
+        dec.read_array_size(VK_MAX_DESCRIPTION_SIZE as u64)?;
         let mut description = [0u8; VK_MAX_DESCRIPTION_SIZE];
         description.copy_from_slice(dec.read_blob(VK_MAX_DESCRIPTION_SIZE)?);
         let format = VkPipelineExecutableStatisticFormatKHR::decode(dec)?;
@@ -30264,7 +30358,9 @@ impl VkPipelineExecutableStatisticKHR {
     }
 
     pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        enc.write_array_size(VK_MAX_DESCRIPTION_SIZE as u64)?;
         enc.write_blob(&self.name)?;
+        enc.write_array_size(VK_MAX_DESCRIPTION_SIZE as u64)?;
         enc.write_blob(&self.description)?;
         (self.format).encode(enc)?;
         (self.value).encode(enc)?;
@@ -30309,8 +30405,10 @@ impl Default for VkPipelineExecutableInternalRepresentationKHR {
 
 impl VkPipelineExecutableInternalRepresentationKHR {
     pub fn decode_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
+        dec.read_array_size(VK_MAX_DESCRIPTION_SIZE as u64)?;
         let mut name = [0u8; VK_MAX_DESCRIPTION_SIZE];
         name.copy_from_slice(dec.read_blob(VK_MAX_DESCRIPTION_SIZE)?);
+        dec.read_array_size(VK_MAX_DESCRIPTION_SIZE as u64)?;
         let mut description = [0u8; VK_MAX_DESCRIPTION_SIZE];
         description.copy_from_slice(dec.read_blob(VK_MAX_DESCRIPTION_SIZE)?);
         let is_text = dec.read_u32()?;
@@ -30343,7 +30441,9 @@ impl VkPipelineExecutableInternalRepresentationKHR {
     }
 
     pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
+        enc.write_array_size(VK_MAX_DESCRIPTION_SIZE as u64)?;
         enc.write_blob(&self.name)?;
+        enc.write_array_size(VK_MAX_DESCRIPTION_SIZE as u64)?;
         enc.write_blob(&self.description)?;
         enc.write_u32(self.is_text)?;
         enc.write_size_t(self.data_size)?;
@@ -30549,12 +30649,15 @@ impl Default for VkPhysicalDeviceVulkan11Properties {
 
 impl VkPhysicalDeviceVulkan11Properties {
     pub fn decode_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
-        let mut device_uuid = core::array::from_fn(|_| Default::default());
-        for item in &mut device_uuid { *item = dec.read_u8()?; }
-        let mut driver_uuid = core::array::from_fn(|_| Default::default());
-        for item in &mut driver_uuid { *item = dec.read_u8()?; }
-        let mut device_luid = core::array::from_fn(|_| Default::default());
-        for item in &mut device_luid { *item = dec.read_u8()?; }
+        dec.read_array_size(VK_UUID_SIZE as u64)?;
+        let mut device_uuid = [0u8; VK_UUID_SIZE];
+        device_uuid.copy_from_slice(dec.read_u8_slice(VK_UUID_SIZE)?);
+        dec.read_array_size(VK_UUID_SIZE as u64)?;
+        let mut driver_uuid = [0u8; VK_UUID_SIZE];
+        driver_uuid.copy_from_slice(dec.read_u8_slice(VK_UUID_SIZE)?);
+        dec.read_array_size(VK_LUID_SIZE as u64)?;
+        let mut device_luid = [0u8; VK_LUID_SIZE];
+        device_luid.copy_from_slice(dec.read_u8_slice(VK_LUID_SIZE)?);
         let device_node_mask = dec.read_u32()?;
         let device_luid_valid = dec.read_u32()?;
         let subgroup_size = dec.read_u32()?;
@@ -30602,9 +30705,12 @@ impl VkPhysicalDeviceVulkan11Properties {
     }
 
     pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
-        for item in &self.device_uuid { enc.write_u8(*item)? }
-        for item in &self.driver_uuid { enc.write_u8(*item)? }
-        for item in &self.device_luid { enc.write_u8(*item)? }
+        enc.write_array_size(VK_UUID_SIZE as u64)?;
+        enc.write_u8_slice(&self.device_uuid)?;
+        enc.write_array_size(VK_UUID_SIZE as u64)?;
+        enc.write_u8_slice(&self.driver_uuid)?;
+        enc.write_array_size(VK_LUID_SIZE as u64)?;
+        enc.write_u8_slice(&self.device_luid)?;
         enc.write_u32(self.device_node_mask)?;
         enc.write_u32(self.device_luid_valid)?;
         enc.write_u32(self.subgroup_size)?;
@@ -30984,8 +31090,10 @@ impl Default for VkPhysicalDeviceVulkan12Properties {
 impl VkPhysicalDeviceVulkan12Properties {
     pub fn decode_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
         let driver_id = VkDriverId::decode(dec)?;
+        dec.read_array_size(VK_MAX_DRIVER_NAME_SIZE as u64)?;
         let mut driver_name = [0u8; VK_MAX_DRIVER_NAME_SIZE];
         driver_name.copy_from_slice(dec.read_blob(VK_MAX_DRIVER_NAME_SIZE)?);
+        dec.read_array_size(VK_MAX_DRIVER_INFO_SIZE as u64)?;
         let mut driver_info = [0u8; VK_MAX_DRIVER_INFO_SIZE];
         driver_info.copy_from_slice(dec.read_blob(VK_MAX_DRIVER_INFO_SIZE)?);
         let conformance_version = VkConformanceVersion::decode(dec)?;
@@ -31110,7 +31218,9 @@ impl VkPhysicalDeviceVulkan12Properties {
 
     pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
         (self.driver_id).encode(enc)?;
+        enc.write_array_size(VK_MAX_DRIVER_NAME_SIZE as u64)?;
         enc.write_blob(&self.driver_name)?;
+        enc.write_array_size(VK_MAX_DRIVER_INFO_SIZE as u64)?;
         enc.write_blob(&self.driver_info)?;
         (self.conformance_version).encode(enc)?;
         (self.denorm_behavior_independence).encode(enc)?;
@@ -31722,8 +31832,9 @@ impl VkPhysicalDeviceVulkan14Properties {
         let p_copy_dst_layouts_sz = dec.read_array_size_unchecked()?;
         let mut p_copy_dst_layouts = Vec::with_capacity(p_copy_dst_layouts_sz as usize);
         for _ in 0..p_copy_dst_layouts_sz { p_copy_dst_layouts.push(VkImageLayout::decode(dec)?); }
-        let mut optimal_tiling_layout_uuid = core::array::from_fn(|_| Default::default());
-        for item in &mut optimal_tiling_layout_uuid { *item = dec.read_u8()?; }
+        dec.read_array_size(VK_UUID_SIZE as u64)?;
+        let mut optimal_tiling_layout_uuid = [0u8; VK_UUID_SIZE];
+        optimal_tiling_layout_uuid.copy_from_slice(dec.read_u8_slice(VK_UUID_SIZE)?);
         let identical_memory_type_requirements = dec.read_u32()?;
         Ok(Self {
             s_type,
@@ -31797,7 +31908,8 @@ impl VkPhysicalDeviceVulkan14Properties {
         enc.write_u32(self.copy_dst_layout_count)?;
         enc.write_array_size(self.p_copy_dst_layouts.len() as u64)?;
         for item in &self.p_copy_dst_layouts { (*item).encode(enc)? }
-        for item in &self.optimal_tiling_layout_uuid { enc.write_u8(*item)? }
+        enc.write_array_size(VK_UUID_SIZE as u64)?;
+        enc.write_u8_slice(&self.optimal_tiling_layout_uuid)?;
         enc.write_u32(self.identical_memory_type_requirements)?;
         Ok(())
     }
@@ -33452,6 +33564,7 @@ impl Default for VkPipelineFragmentShadingRateStateCreateInfoKHR {
 impl VkPipelineFragmentShadingRateStateCreateInfoKHR {
     pub fn decode_self(dec: &mut Decoder<'_>, s_type: VkStructureType, _p_next: ()) -> Result<Self, WireError> {
         let fragment_size = VkExtent2D::decode(dec)?;
+        dec.read_array_size(2 as u64)?;
         let mut combiner_ops = core::array::from_fn(|_| Default::default());
         for item in &mut combiner_ops { *item = VkFragmentShadingRateCombinerOpKHR::decode(dec)?; }
         Ok(Self {
@@ -33477,6 +33590,7 @@ impl VkPipelineFragmentShadingRateStateCreateInfoKHR {
 
     pub fn encode_self<S: WireSink>(&self, enc: &mut Encoder<S>) -> Result<(), WireError> {
         (self.fragment_size).encode(enc)?;
+        enc.write_array_size(2 as u64)?;
         for item in &self.combiner_ops { (*item).encode(enc)? }
         Ok(())
     }

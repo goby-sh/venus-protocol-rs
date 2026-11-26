@@ -372,16 +372,25 @@ def emit_struct_decode_member_uncond(
         dim = var.ty.decor.dim
         if dim == "3][4":
             lines.append(
+                f"{indent}dec.read_array_size(3)?;\n"
                 f"{indent}let mut {fn} = [[0.0_f32; 4]; 3];\n"
-                f"{indent}for row in &mut {fn} {{ for cell in row {{ *cell = dec.read_f32()?; }} }}\n"
+                f"{indent}for row in &mut {fn} {{ dec.read_array_size(4)?; for cell in row {{ *cell = dec.read_f32()?; }} }}\n"
             )
         elif base.name == "char":
             lines.append(
+                f"{indent}dec.read_array_size({dim} as u64)?;\n"
                 f"{indent}let mut {fn} = [0u8; {dim}];\n"
                 f"{indent}{fn}.copy_from_slice(dec.read_blob({dim})?);\n"
             )
+        elif resolve_base(base).name == "uint8_t":
+            lines.append(
+                f"{indent}dec.read_array_size({dim} as u64)?;\n"
+                f"{indent}let mut {fn} = [0u8; {dim}];\n"
+                f"{indent}{fn}.copy_from_slice(dec.read_u8_slice({dim})?);\n"
+            )
         else:
             lines.append(
+                f"{indent}dec.read_array_size({dim} as u64)?;\n"
                 f"{indent}let mut {fn} = core::array::from_fn(|_| Default::default());\n"
                 f"{indent}for item in &mut {fn} {{ *item = {emit_scalar_decode(base)}; }}\n"
             )
@@ -491,13 +500,23 @@ def emit_struct_encode_member_uncond(
         dim = var.ty.decor.dim
         if dim == "3][4":
             lines.append(
-                f"{indent}for row in &{prefix}{fn} {{ for &cell in row {{ enc.write_f32(cell)?; }} }}\n"
+                f"{indent}enc.write_array_size(3)?;\n"
+                f"{indent}for row in &{prefix}{fn} {{ enc.write_array_size(4)?; for &cell in row {{ enc.write_f32(cell)?; }} }}\n"
             )
         elif base.name == "char":
-            lines.append(f"{indent}enc.write_blob(&{prefix}{fn})?;\n")
+            lines.append(
+                f"{indent}enc.write_array_size({dim} as u64)?;\n"
+                f"{indent}enc.write_blob(&{prefix}{fn})?;\n"
+            )
+        elif resolve_base(base).name == "uint8_t":
+            lines.append(
+                f"{indent}enc.write_array_size({dim} as u64)?;\n"
+                f"{indent}enc.write_u8_slice(&{prefix}{fn})?;\n"
+            )
         else:
             ref = "&" if prefix else ""
             lines.append(
+                f"{indent}enc.write_array_size({dim} as u64)?;\n"
                 f"{indent}for item in {ref}{prefix}{fn} {{ {emit_scalar_encode(base, '*item' if base.category != base.STRUCT and base.category != base.UNION else 'item')} }}\n"
             )
         return lines
