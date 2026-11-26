@@ -19007,14 +19007,9 @@ impl VkBufferCreateInfo {
         let usage = dec.read_u32()?;
         let sharing_mode = VkSharingMode::decode(dec)?;
         let queue_family_index_count = dec.read_u32()?;
-        let p_queue_family_indices = if sharing_mode == VkSharingMode::VK_SHARING_MODE_CONCURRENT {
-            let p_queue_family_indices_sz = dec.read_array_size_unchecked()?;
-            let mut p_queue_family_indices = Vec::with_capacity(p_queue_family_indices_sz as usize);
-            for _ in 0..p_queue_family_indices_sz { p_queue_family_indices.push(dec.read_u32()?); }
-            p_queue_family_indices
-        } else {
-            Default::default()
-        };
+        let p_queue_family_indices_sz = dec.read_array_size_unchecked()?;
+        let mut p_queue_family_indices = Vec::with_capacity(p_queue_family_indices_sz as usize);
+        for _ in 0..p_queue_family_indices_sz { p_queue_family_indices.push(dec.read_u32()?); }
         Ok(Self {
             s_type,
             p_next,
@@ -19049,10 +19044,8 @@ impl VkBufferCreateInfo {
         enc.write_u32(self.usage)?;
         (self.sharing_mode).encode(enc)?;
         enc.write_u32(self.queue_family_index_count)?;
-        if self.sharing_mode == VkSharingMode::VK_SHARING_MODE_CONCURRENT {
-            enc.write_array_size(self.p_queue_family_indices.len() as u64)?;
-            for item in &self.p_queue_family_indices { enc.write_u32(*item)? }
-        }
+        enc.write_array_size(self.p_queue_family_indices.len() as u64)?;
+        for item in &self.p_queue_family_indices { enc.write_u32(*item)? }
         Ok(())
     }
 
@@ -19669,14 +19662,9 @@ impl VkImageCreateInfo {
         let usage = dec.read_u32()?;
         let sharing_mode = VkSharingMode::decode(dec)?;
         let queue_family_index_count = dec.read_u32()?;
-        let p_queue_family_indices = if sharing_mode == VkSharingMode::VK_SHARING_MODE_CONCURRENT {
-            let p_queue_family_indices_sz = dec.read_array_size_unchecked()?;
-            let mut p_queue_family_indices = Vec::with_capacity(p_queue_family_indices_sz as usize);
-            for _ in 0..p_queue_family_indices_sz { p_queue_family_indices.push(dec.read_u32()?); }
-            p_queue_family_indices
-        } else {
-            Default::default()
-        };
+        let p_queue_family_indices_sz = dec.read_array_size_unchecked()?;
+        let mut p_queue_family_indices = Vec::with_capacity(p_queue_family_indices_sz as usize);
+        for _ in 0..p_queue_family_indices_sz { p_queue_family_indices.push(dec.read_u32()?); }
         let initial_layout = VkImageLayout::decode(dec)?;
         Ok(Self {
             s_type,
@@ -19725,10 +19713,8 @@ impl VkImageCreateInfo {
         enc.write_u32(self.usage)?;
         (self.sharing_mode).encode(enc)?;
         enc.write_u32(self.queue_family_index_count)?;
-        if self.sharing_mode == VkSharingMode::VK_SHARING_MODE_CONCURRENT {
-            enc.write_array_size(self.p_queue_family_indices.len() as u64)?;
-            for item in &self.p_queue_family_indices { enc.write_u32(*item)? }
-        }
+        enc.write_array_size(self.p_queue_family_indices.len() as u64)?;
+        for item in &self.p_queue_family_indices { enc.write_u32(*item)? }
         (self.initial_layout).encode(enc)?;
         Ok(())
     }
@@ -24871,14 +24857,9 @@ impl VkFramebufferCreateInfo {
         let flags = dec.read_u32()?;
         let render_pass = VkRenderPass::decode(dec)?;
         let attachment_count = dec.read_u32()?;
-        let p_attachments = if (flags & VkFramebufferCreateFlagBits::VK_FRAMEBUFFER_CREATE_IMAGELESS_BIT.0 as u32) == 0 {
-            let p_attachments_sz = dec.read_array_size_unchecked()?;
-            let mut p_attachments = Vec::with_capacity(p_attachments_sz as usize);
-            for _ in 0..p_attachments_sz { p_attachments.push(VkImageView::decode(dec)?); }
-            p_attachments
-        } else {
-            Default::default()
-        };
+        let p_attachments_sz = dec.read_array_size_unchecked()?;
+        let mut p_attachments = Vec::with_capacity(p_attachments_sz as usize);
+        for _ in 0..p_attachments_sz { p_attachments.push(VkImageView::decode(dec)?); }
         let width = dec.read_u32()?;
         let height = dec.read_u32()?;
         let layers = dec.read_u32()?;
@@ -24915,10 +24896,8 @@ impl VkFramebufferCreateInfo {
         enc.write_u32(self.flags)?;
         (self.render_pass).encode(enc)?;
         enc.write_u32(self.attachment_count)?;
-        if (self.flags & VkFramebufferCreateFlagBits::VK_FRAMEBUFFER_CREATE_IMAGELESS_BIT.0 as u32) == 0 {
-            enc.write_array_size(self.p_attachments.len() as u64)?;
-            for item in &self.p_attachments { (*item).encode(enc)? }
-        }
+        enc.write_array_size(self.p_attachments.len() as u64)?;
+        for item in &self.p_attachments { (*item).encode(enc)? }
         enc.write_u32(self.width)?;
         enc.write_u32(self.height)?;
         enc.write_u32(self.layers)?;
@@ -29385,14 +29364,9 @@ impl VkPhysicalDeviceImageDrmFormatModifierInfoEXT {
         let drm_format_modifier = dec.read_u64()?;
         let sharing_mode = VkSharingMode::decode(dec)?;
         let queue_family_index_count = dec.read_u32()?;
-        let p_queue_family_indices = if sharing_mode == VkSharingMode::VK_SHARING_MODE_CONCURRENT {
-            let p_queue_family_indices_sz = dec.read_array_size_unchecked()?;
-            let mut p_queue_family_indices = Vec::with_capacity(p_queue_family_indices_sz as usize);
-            for _ in 0..p_queue_family_indices_sz { p_queue_family_indices.push(dec.read_u32()?); }
-            p_queue_family_indices
-        } else {
-            Default::default()
-        };
+        let p_queue_family_indices_sz = dec.read_array_size_unchecked()?;
+        let mut p_queue_family_indices = Vec::with_capacity(p_queue_family_indices_sz as usize);
+        for _ in 0..p_queue_family_indices_sz { p_queue_family_indices.push(dec.read_u32()?); }
         Ok(Self {
             s_type,
             drm_format_modifier,
@@ -29421,10 +29395,8 @@ impl VkPhysicalDeviceImageDrmFormatModifierInfoEXT {
         enc.write_u64(self.drm_format_modifier)?;
         (self.sharing_mode).encode(enc)?;
         enc.write_u32(self.queue_family_index_count)?;
-        if self.sharing_mode == VkSharingMode::VK_SHARING_MODE_CONCURRENT {
-            enc.write_array_size(self.p_queue_family_indices.len() as u64)?;
-            for item in &self.p_queue_family_indices { enc.write_u32(*item)? }
-        }
+        enc.write_array_size(self.p_queue_family_indices.len() as u64)?;
+        for item in &self.p_queue_family_indices { enc.write_u32(*item)? }
         Ok(())
     }
 

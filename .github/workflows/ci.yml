@@ -17,6 +17,7 @@ jobs:
           components: clippy
       - run: cargo test --lib
       - run: cargo test --test roundtrip
+      - run: cargo test --test real_captures compute_double_plus_one_byte_exact_roundtrip
       - run: cargo check --no-default-features
       - run: cargo check --no-default-features --features alloc
       - run: cargo check --target wasm32-unknown-unknown --no-default-features --features alloc

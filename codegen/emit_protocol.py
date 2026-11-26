@@ -355,16 +355,6 @@ def emit_struct_decode_member(
                 lines.append(f"{indent}let _ = dec.read_simple_pointer()?;\n")
         return lines
 
-    ign_cond = IGNORABLE_STRUCT_VARS.get((ty.name, var.name))
-    if ign_cond:
-        # Cond uses `val.` prefix; in decode_self, prior fields are local variables
-        cond_local = ign_cond.replace("val.", "")
-        lines.append(f"{indent}let {fn} = if {cond_local} {{\n")
-        inner = emit_struct_decode_member_uncond(ty, var, vars_map, indent + "    ")
-        lines.extend(inner)
-        lines.append(f"{indent}    {fn}\n{indent}}} else {{\n{indent}    Default::default()\n{indent}}};\n")
-        return lines
-
     return emit_struct_decode_member_uncond(ty, var, vars_map, indent)
 
 
@@ -481,14 +471,6 @@ def emit_struct_encode_member(
                 lines.append(f"{indent}enc.write_array_size({prefix}{fn}.len() as u64)?;\n")
             else:
                 lines.append(f"{indent}enc.write_simple_pointer({prefix}{fn}.is_some())?;\n")
-        return lines
-
-    ign_cond = IGNORABLE_STRUCT_VARS.get((ty.name, var.name))
-    if ign_cond:
-        cond_prefixed = ign_cond.replace("val.", prefix)
-        lines.append(f"{indent}if {cond_prefixed} {{\n")
-        lines.extend(emit_struct_encode_member_uncond(ty, var, vars_map, prefix, indent + "    "))
-        lines.append(f"{indent}}}\n")
         return lines
 
     return emit_struct_encode_member_uncond(ty, var, vars_map, prefix, indent)

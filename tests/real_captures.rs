@@ -24,7 +24,7 @@ fn decode_and_reencode_stream(stream: &[u8]) -> (Vec<VkCommandTypeEXT>, Vec<u8>)
 fn compute_double_plus_one_byte_exact_roundtrip() {
     let (cmds, reencoded) = decode_and_reencode_stream(COMPUTE_BIN);
     assert!(!cmds.is_empty());
-    assert!(cmds.contains(&VkCommandTypeEXT::VK_COMMAND_TYPE_vkCreateInstance_EXT));
+    assert!(cmds.contains(&VkCommandTypeEXT::VK_COMMAND_TYPE_vkAllocateMemory_EXT));
     assert!(cmds.contains(&VkCommandTypeEXT::VK_COMMAND_TYPE_vkCmdDispatch_EXT));
     assert_eq!(reencoded.len(), COMPUTE_BIN.len());
     assert_eq!(reencoded.as_slice(), COMPUTE_BIN);

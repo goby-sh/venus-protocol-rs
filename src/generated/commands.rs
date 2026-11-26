@@ -123,7 +123,8 @@ impl VkEnumeratePhysicalDevicesRequest {
         let instance = VkInstance::decode(dec)?;
         let p_physical_device_count = if dec.read_simple_pointer()? { Some(Box::new(dec.read_u32()?)) } else { None };
         let p_physical_devices_sz = dec.read_array_size_unchecked()?;
-        let p_physical_devices = Vec::with_capacity(p_physical_devices_sz as usize);
+        let mut p_physical_devices = Vec::with_capacity(p_physical_devices_sz as usize);
+        for _ in 0..p_physical_devices_sz { p_physical_devices.push(VkPhysicalDevice::decode(dec)?); }
         Ok(Self {
             instance,
             p_physical_device_count,
@@ -139,6 +140,7 @@ impl VkEnumeratePhysicalDevicesRequest {
             Some(v) => { enc.write_simple_pointer(true)?; enc.write_u32(**v)?; }
         }
         enc.write_array_size(self.p_physical_devices.len() as u64)?;
+        for item in &self.p_physical_devices { item.encode(enc)?; }
         Ok(())
     }
 }
@@ -247,7 +249,8 @@ impl VkGetPhysicalDeviceQueueFamilyPropertiesRequest {
         let physical_device = VkPhysicalDevice::decode(dec)?;
         let p_queue_family_property_count = if dec.read_simple_pointer()? { Some(Box::new(dec.read_u32()?)) } else { None };
         let p_queue_family_properties_sz = dec.read_array_size_unchecked()?;
-        let p_queue_family_properties = Vec::with_capacity(p_queue_family_properties_sz as usize);
+        let mut p_queue_family_properties = Vec::with_capacity(p_queue_family_properties_sz as usize);
+        for _ in 0..p_queue_family_properties_sz { p_queue_family_properties.push(VkQueueFamilyProperties::decode_partial(dec)?); }
         Ok(Self {
             physical_device,
             p_queue_family_property_count,
@@ -263,6 +266,7 @@ impl VkGetPhysicalDeviceQueueFamilyPropertiesRequest {
             Some(v) => { enc.write_simple_pointer(true)?; enc.write_u32(**v)?; }
         }
         enc.write_array_size(self.p_queue_family_properties.len() as u64)?;
+        for item in &self.p_queue_family_properties { item.encode_partial(enc)?; }
         Ok(())
     }
 }
@@ -715,7 +719,8 @@ impl VkEnumerateInstanceLayerPropertiesRequest {
     pub fn decode(dec: &mut Decoder<'_>) -> Result<Self, WireError> {
         let p_property_count = if dec.read_simple_pointer()? { Some(Box::new(dec.read_u32()?)) } else { None };
         let p_properties_sz = dec.read_array_size_unchecked()?;
-        let p_properties = Vec::with_capacity(p_properties_sz as usize);
+        let mut p_properties = Vec::with_capacity(p_properties_sz as usize);
+        for _ in 0..p_properties_sz { p_properties.push(VkLayerProperties::decode_partial(dec)?); }
         Ok(Self {
             p_property_count,
             p_properties,
@@ -729,6 +734,7 @@ impl VkEnumerateInstanceLayerPropertiesRequest {
             Some(v) => { enc.write_simple_pointer(true)?; enc.write_u32(**v)?; }
         }
         enc.write_array_size(self.p_properties.len() as u64)?;
+        for item in &self.p_properties { item.encode_partial(enc)?; }
         Ok(())
     }
 }
@@ -784,7 +790,8 @@ impl VkEnumerateInstanceExtensionPropertiesRequest {
         let p_layer_name = if p_layer_name_sz == 0 { None } else { Some(dec.read_string(p_layer_name_sz as usize)?) };
         let p_property_count = if dec.read_simple_pointer()? { Some(Box::new(dec.read_u32()?)) } else { None };
         let p_properties_sz = dec.read_array_size_unchecked()?;
-        let p_properties = Vec::with_capacity(p_properties_sz as usize);
+        let mut p_properties = Vec::with_capacity(p_properties_sz as usize);
+        for _ in 0..p_properties_sz { p_properties.push(VkExtensionProperties::decode_partial(dec)?); }
         Ok(Self {
             p_layer_name,
             p_property_count,
@@ -810,6 +817,7 @@ impl VkEnumerateInstanceExtensionPropertiesRequest {
             Some(v) => { enc.write_simple_pointer(true)?; enc.write_u32(**v)?; }
         }
         enc.write_array_size(self.p_properties.len() as u64)?;
+        for item in &self.p_properties { item.encode_partial(enc)?; }
         Ok(())
     }
 }
@@ -864,7 +872,8 @@ impl VkEnumerateDeviceLayerPropertiesRequest {
         let physical_device = VkPhysicalDevice::decode(dec)?;
         let p_property_count = if dec.read_simple_pointer()? { Some(Box::new(dec.read_u32()?)) } else { None };
         let p_properties_sz = dec.read_array_size_unchecked()?;
-        let p_properties = Vec::with_capacity(p_properties_sz as usize);
+        let mut p_properties = Vec::with_capacity(p_properties_sz as usize);
+        for _ in 0..p_properties_sz { p_properties.push(VkLayerProperties::decode_partial(dec)?); }
         Ok(Self {
             physical_device,
             p_property_count,
@@ -880,6 +889,7 @@ impl VkEnumerateDeviceLayerPropertiesRequest {
             Some(v) => { enc.write_simple_pointer(true)?; enc.write_u32(**v)?; }
         }
         enc.write_array_size(self.p_properties.len() as u64)?;
+        for item in &self.p_properties { item.encode_partial(enc)?; }
         Ok(())
     }
 }
@@ -937,7 +947,8 @@ impl VkEnumerateDeviceExtensionPropertiesRequest {
         let p_layer_name = if p_layer_name_sz == 0 { None } else { Some(dec.read_string(p_layer_name_sz as usize)?) };
         let p_property_count = if dec.read_simple_pointer()? { Some(Box::new(dec.read_u32()?)) } else { None };
         let p_properties_sz = dec.read_array_size_unchecked()?;
-        let p_properties = Vec::with_capacity(p_properties_sz as usize);
+        let mut p_properties = Vec::with_capacity(p_properties_sz as usize);
+        for _ in 0..p_properties_sz { p_properties.push(VkExtensionProperties::decode_partial(dec)?); }
         Ok(Self {
             physical_device,
             p_layer_name,
@@ -965,6 +976,7 @@ impl VkEnumerateDeviceExtensionPropertiesRequest {
             Some(v) => { enc.write_simple_pointer(true)?; enc.write_u32(**v)?; }
         }
         enc.write_array_size(self.p_properties.len() as u64)?;
+        for item in &self.p_properties { item.encode_partial(enc)?; }
         Ok(())
     }
 }
@@ -1780,7 +1792,8 @@ impl VkGetImageSparseMemoryRequirementsRequest {
         let image = VkImage::decode(dec)?;
         let p_sparse_memory_requirement_count = if dec.read_simple_pointer()? { Some(Box::new(dec.read_u32()?)) } else { None };
         let p_sparse_memory_requirements_sz = dec.read_array_size_unchecked()?;
-        let p_sparse_memory_requirements = Vec::with_capacity(p_sparse_memory_requirements_sz as usize);
+        let mut p_sparse_memory_requirements = Vec::with_capacity(p_sparse_memory_requirements_sz as usize);
+        for _ in 0..p_sparse_memory_requirements_sz { p_sparse_memory_requirements.push(VkSparseImageMemoryRequirements::decode_partial(dec)?); }
         Ok(Self {
             device,
             image,
@@ -1798,6 +1811,7 @@ impl VkGetImageSparseMemoryRequirementsRequest {
             Some(v) => { enc.write_simple_pointer(true)?; enc.write_u32(**v)?; }
         }
         enc.write_array_size(self.p_sparse_memory_requirements.len() as u64)?;
+        for item in &self.p_sparse_memory_requirements { item.encode_partial(enc)?; }
         Ok(())
     }
 }
@@ -1858,7 +1872,8 @@ impl VkGetPhysicalDeviceSparseImageFormatPropertiesRequest {
         let tiling = VkImageTiling::decode(dec)?;
         let p_property_count = if dec.read_simple_pointer()? { Some(Box::new(dec.read_u32()?)) } else { None };
         let p_properties_sz = dec.read_array_size_unchecked()?;
-        let p_properties = Vec::with_capacity(p_properties_sz as usize);
+        let mut p_properties = Vec::with_capacity(p_properties_sz as usize);
+        for _ in 0..p_properties_sz { p_properties.push(VkSparseImageFormatProperties::decode_partial(dec)?); }
         Ok(Self {
             physical_device,
             format,
@@ -1884,6 +1899,7 @@ impl VkGetPhysicalDeviceSparseImageFormatPropertiesRequest {
             Some(v) => { enc.write_simple_pointer(true)?; enc.write_u32(**v)?; }
         }
         enc.write_array_size(self.p_properties.len() as u64)?;
+        for item in &self.p_properties { item.encode_partial(enc)?; }
         Ok(())
     }
 }
@@ -3768,7 +3784,8 @@ impl VkCreateGraphicsPipelinesRequest {
         for _ in 0..p_create_infos_sz { p_create_infos.push(VkGraphicsPipelineCreateInfo::decode(dec)?); }
         if dec.read_simple_pointer()? { return Err(WireError::InvalidPointerFlag(1)); }
         let p_pipelines_sz = dec.read_array_size_unchecked()?;
-        let p_pipelines = Vec::with_capacity(p_pipelines_sz as usize);
+        let mut p_pipelines = Vec::with_capacity(p_pipelines_sz as usize);
+        for _ in 0..p_pipelines_sz { p_pipelines.push(VkPipeline::decode(dec)?); }
         Ok(Self {
             device,
             pipeline_cache,
@@ -3787,6 +3804,7 @@ impl VkCreateGraphicsPipelinesRequest {
         for item in &self.p_create_infos { (item).encode(enc)? }
         enc.write_simple_pointer(false)?;
         enc.write_array_size(self.p_pipelines.len() as u64)?;
+        for item in &self.p_pipelines { item.encode(enc)?; }
         Ok(())
     }
 }
@@ -3841,7 +3859,8 @@ impl VkCreateComputePipelinesRequest {
         for _ in 0..p_create_infos_sz { p_create_infos.push(VkComputePipelineCreateInfo::decode(dec)?); }
         if dec.read_simple_pointer()? { return Err(WireError::InvalidPointerFlag(1)); }
         let p_pipelines_sz = dec.read_array_size_unchecked()?;
-        let p_pipelines = Vec::with_capacity(p_pipelines_sz as usize);
+        let mut p_pipelines = Vec::with_capacity(p_pipelines_sz as usize);
+        for _ in 0..p_pipelines_sz { p_pipelines.push(VkPipeline::decode(dec)?); }
         Ok(Self {
             device,
             pipeline_cache,
@@ -3860,6 +3879,7 @@ impl VkCreateComputePipelinesRequest {
         for item in &self.p_create_infos { (item).encode(enc)? }
         enc.write_simple_pointer(false)?;
         enc.write_array_size(self.p_pipelines.len() as u64)?;
+        for item in &self.p_pipelines { item.encode(enc)?; }
         Ok(())
     }
 }
@@ -4457,7 +4477,8 @@ impl VkAllocateDescriptorSetsRequest {
         let device = VkDevice::decode(dec)?;
         let p_allocate_info = if dec.read_simple_pointer()? { Some(Box::new(VkDescriptorSetAllocateInfo::decode(dec)?)) } else { None };
         let p_descriptor_sets_sz = dec.read_array_size_unchecked()?;
-        let p_descriptor_sets = Vec::with_capacity(p_descriptor_sets_sz as usize);
+        let mut p_descriptor_sets = Vec::with_capacity(p_descriptor_sets_sz as usize);
+        for _ in 0..p_descriptor_sets_sz { p_descriptor_sets.push(VkDescriptorSet::decode(dec)?); }
         Ok(Self {
             device,
             p_allocate_info,
@@ -4473,6 +4494,7 @@ impl VkAllocateDescriptorSetsRequest {
             Some(v) => { enc.write_simple_pointer(true)?; (v).encode(enc)?; }
         }
         enc.write_array_size(self.p_descriptor_sets.len() as u64)?;
+        for item in &self.p_descriptor_sets { item.encode(enc)?; }
         Ok(())
     }
 }
@@ -5151,7 +5173,8 @@ impl VkAllocateCommandBuffersRequest {
         let device = VkDevice::decode(dec)?;
         let p_allocate_info = if dec.read_simple_pointer()? { Some(Box::new(VkCommandBufferAllocateInfo::decode(dec)?)) } else { None };
         let p_command_buffers_sz = dec.read_array_size_unchecked()?;
-        let p_command_buffers = Vec::with_capacity(p_command_buffers_sz as usize);
+        let mut p_command_buffers = Vec::with_capacity(p_command_buffers_sz as usize);
+        for _ in 0..p_command_buffers_sz { p_command_buffers.push(VkCommandBuffer::decode(dec)?); }
         Ok(Self {
             device,
             p_allocate_info,
@@ -5167,6 +5190,7 @@ impl VkAllocateCommandBuffersRequest {
             Some(v) => { enc.write_simple_pointer(true)?; (v).encode(enc)?; }
         }
         enc.write_array_size(self.p_command_buffers.len() as u64)?;
+        for item in &self.p_command_buffers { item.encode(enc)?; }
         Ok(())
     }
 }
@@ -8543,7 +8567,8 @@ impl VkGetPhysicalDeviceQueueFamilyProperties2Request {
         let physical_device = VkPhysicalDevice::decode(dec)?;
         let p_queue_family_property_count = if dec.read_simple_pointer()? { Some(Box::new(dec.read_u32()?)) } else { None };
         let p_queue_family_properties_sz = dec.read_array_size_unchecked()?;
-        let p_queue_family_properties = Vec::with_capacity(p_queue_family_properties_sz as usize);
+        let mut p_queue_family_properties = Vec::with_capacity(p_queue_family_properties_sz as usize);
+        for _ in 0..p_queue_family_properties_sz { p_queue_family_properties.push(VkQueueFamilyProperties2::decode_partial(dec)?); }
         Ok(Self {
             physical_device,
             p_queue_family_property_count,
@@ -8559,6 +8584,7 @@ impl VkGetPhysicalDeviceQueueFamilyProperties2Request {
             Some(v) => { enc.write_simple_pointer(true)?; enc.write_u32(**v)?; }
         }
         enc.write_array_size(self.p_queue_family_properties.len() as u64)?;
+        for item in &self.p_queue_family_properties { item.encode_partial(enc)?; }
         Ok(())
     }
 }
@@ -8665,7 +8691,8 @@ impl VkGetPhysicalDeviceSparseImageFormatProperties2Request {
         let p_format_info = if dec.read_simple_pointer()? { Some(Box::new(VkPhysicalDeviceSparseImageFormatInfo2::decode(dec)?)) } else { None };
         let p_property_count = if dec.read_simple_pointer()? { Some(Box::new(dec.read_u32()?)) } else { None };
         let p_properties_sz = dec.read_array_size_unchecked()?;
-        let p_properties = Vec::with_capacity(p_properties_sz as usize);
+        let mut p_properties = Vec::with_capacity(p_properties_sz as usize);
+        for _ in 0..p_properties_sz { p_properties.push(VkSparseImageFormatProperties2::decode_partial(dec)?); }
         Ok(Self {
             physical_device,
             p_format_info,
@@ -8686,6 +8713,7 @@ impl VkGetPhysicalDeviceSparseImageFormatProperties2Request {
             Some(v) => { enc.write_simple_pointer(true)?; enc.write_u32(**v)?; }
         }
         enc.write_array_size(self.p_properties.len() as u64)?;
+        for item in &self.p_properties { item.encode_partial(enc)?; }
         Ok(())
     }
 }
@@ -9030,7 +9058,8 @@ impl VkEnumeratePhysicalDeviceGroupsRequest {
         let instance = VkInstance::decode(dec)?;
         let p_physical_device_group_count = if dec.read_simple_pointer()? { Some(Box::new(dec.read_u32()?)) } else { None };
         let p_physical_device_group_properties_sz = dec.read_array_size_unchecked()?;
-        let p_physical_device_group_properties = Vec::with_capacity(p_physical_device_group_properties_sz as usize);
+        let mut p_physical_device_group_properties = Vec::with_capacity(p_physical_device_group_properties_sz as usize);
+        for _ in 0..p_physical_device_group_properties_sz { p_physical_device_group_properties.push(VkPhysicalDeviceGroupProperties::decode_partial(dec)?); }
         Ok(Self {
             instance,
             p_physical_device_group_count,
@@ -9046,6 +9075,7 @@ impl VkEnumeratePhysicalDeviceGroupsRequest {
             Some(v) => { enc.write_simple_pointer(true)?; enc.write_u32(**v)?; }
         }
         enc.write_array_size(self.p_physical_device_group_properties.len() as u64)?;
+        for item in &self.p_physical_device_group_properties { item.encode_partial(enc)?; }
         Ok(())
     }
 }
@@ -9723,7 +9753,8 @@ impl VkGetImageSparseMemoryRequirements2Request {
         let p_info = if dec.read_simple_pointer()? { Some(Box::new(VkImageSparseMemoryRequirementsInfo2::decode(dec)?)) } else { None };
         let p_sparse_memory_requirement_count = if dec.read_simple_pointer()? { Some(Box::new(dec.read_u32()?)) } else { None };
         let p_sparse_memory_requirements_sz = dec.read_array_size_unchecked()?;
-        let p_sparse_memory_requirements = Vec::with_capacity(p_sparse_memory_requirements_sz as usize);
+        let mut p_sparse_memory_requirements = Vec::with_capacity(p_sparse_memory_requirements_sz as usize);
+        for _ in 0..p_sparse_memory_requirements_sz { p_sparse_memory_requirements.push(VkSparseImageMemoryRequirements2::decode_partial(dec)?); }
         Ok(Self {
             device,
             p_info,
@@ -9744,6 +9775,7 @@ impl VkGetImageSparseMemoryRequirements2Request {
             Some(v) => { enc.write_simple_pointer(true)?; enc.write_u32(**v)?; }
         }
         enc.write_array_size(self.p_sparse_memory_requirements.len() as u64)?;
+        for item in &self.p_sparse_memory_requirements { item.encode_partial(enc)?; }
         Ok(())
     }
 }
@@ -9918,7 +9950,8 @@ impl VkGetDeviceImageSparseMemoryRequirementsRequest {
         let p_info = if dec.read_simple_pointer()? { Some(Box::new(VkDeviceImageMemoryRequirements::decode(dec)?)) } else { None };
         let p_sparse_memory_requirement_count = if dec.read_simple_pointer()? { Some(Box::new(dec.read_u32()?)) } else { None };
         let p_sparse_memory_requirements_sz = dec.read_array_size_unchecked()?;
-        let p_sparse_memory_requirements = Vec::with_capacity(p_sparse_memory_requirements_sz as usize);
+        let mut p_sparse_memory_requirements = Vec::with_capacity(p_sparse_memory_requirements_sz as usize);
+        for _ in 0..p_sparse_memory_requirements_sz { p_sparse_memory_requirements.push(VkSparseImageMemoryRequirements2::decode_partial(dec)?); }
         Ok(Self {
             device,
             p_info,
@@ -9939,6 +9972,7 @@ impl VkGetDeviceImageSparseMemoryRequirementsRequest {
             Some(v) => { enc.write_simple_pointer(true)?; enc.write_u32(**v)?; }
         }
         enc.write_array_size(self.p_sparse_memory_requirements.len() as u64)?;
+        for item in &self.p_sparse_memory_requirements { item.encode_partial(enc)?; }
         Ok(())
     }
 }
@@ -12038,7 +12072,8 @@ impl VkCreateRayTracingPipelinesKHRRequest {
         for _ in 0..p_create_infos_sz { p_create_infos.push(VkRayTracingPipelineCreateInfoKHR::decode(dec)?); }
         if dec.read_simple_pointer()? { return Err(WireError::InvalidPointerFlag(1)); }
         let p_pipelines_sz = dec.read_array_size_unchecked()?;
-        let p_pipelines = Vec::with_capacity(p_pipelines_sz as usize);
+        let mut p_pipelines = Vec::with_capacity(p_pipelines_sz as usize);
+        for _ in 0..p_pipelines_sz { p_pipelines.push(VkPipeline::decode(dec)?); }
         Ok(Self {
             device,
             deferred_operation,
@@ -12059,6 +12094,7 @@ impl VkCreateRayTracingPipelinesKHRRequest {
         for item in &self.p_create_infos { (item).encode(enc)? }
         enc.write_simple_pointer(false)?;
         enc.write_array_size(self.p_pipelines.len() as u64)?;
+        for item in &self.p_pipelines { item.encode(enc)?; }
         Ok(())
     }
 }
@@ -12643,7 +12679,8 @@ impl VkGetPhysicalDeviceToolPropertiesRequest {
         let physical_device = VkPhysicalDevice::decode(dec)?;
         let p_tool_count = if dec.read_simple_pointer()? { Some(Box::new(dec.read_u32()?)) } else { None };
         let p_tool_properties_sz = dec.read_array_size_unchecked()?;
-        let p_tool_properties = Vec::with_capacity(p_tool_properties_sz as usize);
+        let mut p_tool_properties = Vec::with_capacity(p_tool_properties_sz as usize);
+        for _ in 0..p_tool_properties_sz { p_tool_properties.push(VkPhysicalDeviceToolProperties::decode_partial(dec)?); }
         Ok(Self {
             physical_device,
             p_tool_count,
@@ -12659,6 +12696,7 @@ impl VkGetPhysicalDeviceToolPropertiesRequest {
             Some(v) => { enc.write_simple_pointer(true)?; enc.write_u32(**v)?; }
         }
         enc.write_array_size(self.p_tool_properties.len() as u64)?;
+        for item in &self.p_tool_properties { item.encode_partial(enc)?; }
         Ok(())
     }
 }
@@ -15638,7 +15676,8 @@ impl VkGetPhysicalDeviceFragmentShadingRatesKHRRequest {
         let physical_device = VkPhysicalDevice::decode(dec)?;
         let p_fragment_shading_rate_count = if dec.read_simple_pointer()? { Some(Box::new(dec.read_u32()?)) } else { None };
         let p_fragment_shading_rates_sz = dec.read_array_size_unchecked()?;
-        let p_fragment_shading_rates = Vec::with_capacity(p_fragment_shading_rates_sz as usize);
+        let mut p_fragment_shading_rates = Vec::with_capacity(p_fragment_shading_rates_sz as usize);
+        for _ in 0..p_fragment_shading_rates_sz { p_fragment_shading_rates.push(VkPhysicalDeviceFragmentShadingRateKHR::decode_partial(dec)?); }
         Ok(Self {
             physical_device,
             p_fragment_shading_rate_count,
@@ -15654,6 +15693,7 @@ impl VkGetPhysicalDeviceFragmentShadingRatesKHRRequest {
             Some(v) => { enc.write_simple_pointer(true)?; enc.write_u32(**v)?; }
         }
         enc.write_array_size(self.p_fragment_shading_rates.len() as u64)?;
+        for item in &self.p_fragment_shading_rates { item.encode_partial(enc)?; }
         Ok(())
     }
 }
@@ -16625,7 +16665,8 @@ impl VkGetPhysicalDeviceCooperativeMatrixPropertiesKHRRequest {
         let physical_device = VkPhysicalDevice::decode(dec)?;
         let p_property_count = if dec.read_simple_pointer()? { Some(Box::new(dec.read_u32()?)) } else { None };
         let p_properties_sz = dec.read_array_size_unchecked()?;
-        let p_properties = Vec::with_capacity(p_properties_sz as usize);
+        let mut p_properties = Vec::with_capacity(p_properties_sz as usize);
+        for _ in 0..p_properties_sz { p_properties.push(VkCooperativeMatrixPropertiesKHR::decode_partial(dec)?); }
         Ok(Self {
             physical_device,
             p_property_count,
@@ -16641,6 +16682,7 @@ impl VkGetPhysicalDeviceCooperativeMatrixPropertiesKHRRequest {
             Some(v) => { enc.write_simple_pointer(true)?; enc.write_u32(**v)?; }
         }
         enc.write_array_size(self.p_properties.len() as u64)?;
+        for item in &self.p_properties { item.encode_partial(enc)?; }
         Ok(())
     }
 }

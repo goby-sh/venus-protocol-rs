@@ -35,6 +35,18 @@ def emit_cmd_arg_decode(cmd: VkType, var: VkVariable, is_out_only: bool) -> list
     base = var.ty.base
     if var.ty.is_pointer():
         if var.is_dynamic_array():
+            if base.category == base.HANDLE:
+                return [
+                    f"        let {fn}_sz = dec.read_array_size_unchecked()?;\n"
+                    f"        let mut {fn} = Vec::with_capacity({fn}_sz as usize);\n"
+                    f"        for _ in 0..{fn}_sz {{ {fn}.push({base.name}::decode(dec)?); }}\n"
+                ]
+            if base.category == base.STRUCT:
+                return [
+                    f"        let {fn}_sz = dec.read_array_size_unchecked()?;\n"
+                    f"        let mut {fn} = Vec::with_capacity({fn}_sz as usize);\n"
+                    f"        for _ in 0..{fn}_sz {{ {fn}.push({base.name}::decode_partial(dec)?); }}\n"
+                ]
             return [
                 f"        let {fn}_sz = dec.read_array_size_unchecked()?;\n"
                 f"        let {fn} = Vec::with_capacity({fn}_sz as usize);\n"
@@ -64,6 +76,16 @@ def emit_cmd_arg_encode(cmd: VkType, var: VkVariable, is_out_only: bool) -> list
     base = var.ty.base
     if var.ty.is_pointer():
         if var.is_dynamic_array():
+            if base.category == base.HANDLE:
+                return [
+                    f"        enc.write_array_size(self.{fn}.len() as u64)?;\n"
+                    f"        for item in &self.{fn} {{ item.encode(enc)?; }}\n"
+                ]
+            if base.category == base.STRUCT:
+                return [
+                    f"        enc.write_array_size(self.{fn}.len() as u64)?;\n"
+                    f"        for item in &self.{fn} {{ item.encode_partial(enc)?; }}\n"
+                ]
             return [f"        enc.write_array_size(self.{fn}.len() as u64)?;\n"]
         if base.category == base.STRUCT:
             return [
